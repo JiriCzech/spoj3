@@ -1,0 +1,174 @@
+/* App Container */
+#app {
+  position: relative;
+  height: 100dvh;
+  max-width: 480px;
+  margin: auto;
+  overflow: hidden;
+}
+
+/* Screens */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* HUD System */
+.hud {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel-bg);
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-label {
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.hud-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Progress System */
+.hack-bar-container {
+  padding: 8px 12px;
+  background: var(--panel-bg);
+}
+
+.hack-bar-track {
+  height: 12px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hack-bar-fill {
+  height: 100%;
+  background: var(--neon-cyan);
+  width: 0%;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.hack-bar-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  letter-spacing: 1px;
+}
+
+/* Match-3 Grid */
+.grid-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.tile {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(14px, 4vw, 22px);
+  cursor: pointer;
+  transition: transform 0.15s;
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+/* Tile Colors */
+.tile-cyan { background: rgba(0, 255, 249, 0.15); border-color: rgba(0, 255, 249, 0.4); box-shadow: inset 0 0 6px rgba(0, 255, 249, 0.2); }
+.tile-purple { background: rgba(191, 90, 242, 0.15); border-color: rgba(191, 90, 242, 0.4); box-shadow: inset 0 0 6px rgba(191, 90, 242, 0.2); }
+.tile-green { background: rgba(57, 255, 20, 0.15); border-color: rgba(57, 255, 20, 0.4); box-shadow: inset 0 0 6px rgba(57, 255, 20, 0.2); }
+.tile-red { background: rgba(255, 45, 85, 0.15); border-color: rgba(255, 45, 85, 0.4); box-shadow: inset 0 0 6px rgba(255, 45, 85, 0.2); }
+.tile-yellow { background: rgba(255, 214, 10, 0.15); border-color: rgba(255, 214, 10, 0.4); box-shadow: inset 0 0 6px rgba(255, 214, 10, 0.2); }
+.tile-orange { background: rgba(255, 107, 0, 0.15); border-color: rgba(255, 107, 0, 0.4); box-shadow: inset 0 0 6px rgba(255, 107, 0, 0.2); }
+
+/* Tile States */
+.tile.selected {
+  border-color: var(--neon-cyan);
+  transform: scale(1.1);
+  box-shadow: 0 0 12px var(--neon-cyan);
+  z-index: 10;
+}
+
+.tile.matched {
+  transform: scale(1.25);
+  filter: brightness(3);
+  transition: 0.3s;
+}
+
+.tile.invalid {
+  animation: shake 0.3s;
+}
+
+/* UI Elements */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 1px solid;
+  border-radius: 2px;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.btn-primary { color: var(--neon-green); border-color: var(--neon-green); box-shadow: 0 0 12px rgba(57, 255, 20, 0.2); }
+.btn-primary:active { background: rgba(57, 255, 20, 0.1); }
+.btn-secondary { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+.btn-danger { color: var(--neon-red); border-color: var(--neon-red); }
+
+/* Shop Cards */
+.card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-name { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--neon-cyan); }
+.card-desc { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
+.card-cost { font-size: 12px; color: var(--neon-yellow); margin-top: auto; }
+.card.rarity-rare { border-color: rgba(191, 90, 242, 0.5); }
+.card.rarity-legendary { border-color: rgba(255, 214, 10, 0.6); box-shadow: 0 0 10px rgba(255, 214, 10, 0.15); }

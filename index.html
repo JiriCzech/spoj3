@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#050a0e">
+    <meta name="description" content="NETRUNNER MATCH - A cyberpunk hacking match-3 roguelike game.">
+    <title>NETRUNNER MATCH | Cyberpunk Hacking Roguelike</title>
+    
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/game.css">
+</head>
+<body class="scanline-overlay">
+    <div id="app">
+        <!-- Screens -->
+        <section id="screen-boot" class="screen">
+            <!-- Initial boot sequence placeholder -->
+        </section>
+
+        <section id="screen-menu" class="screen">
+            <!-- Main menu screens -->
+        </section>
+
+        <section id="screen-contract" class="screen">
+            <!-- Mission selection -->
+        </section>
+
+        <section id="screen-game" class="screen">
+            <!-- Main Match-3 gameplay -->
+        </section>
+
+        <section id="screen-shop" class="screen">
+            <!-- Roguelike shop between levels -->
+        </section>
+
+        <section id="screen-gameover" class="screen">
+            <!-- Results and restart -->
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/state.js"></script>
+    <script src="js/upgrades.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registered'))
+                .catch(err => console.log('SW error', err));
+        }
+    </script>
+</body>
+</html>

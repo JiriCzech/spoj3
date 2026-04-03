@@ -1,0 +1,243 @@
+
+
+
+
+
+Uplatnit nabídku
+Ahoj, mám tu další brainstorm. Tentokrát bych rád udělal hru na mobil. Bude to ale webová hra, ale ty jsi nejsláš jako PWA. To znamená, lehcele je to primárně dělené na mobil. Je to hra spoj 3. Prostě klasika, máš prostě kameny, mřížce a spojuješ je prostě tak, že klikneš a když se spojí tři nebo více kamenů, tak to prostě jako kdyby krešne, všechno se to posune, objeví se nové kameny a ty získáš nějaké body. Jo, třeba, nevím, za spojené 3 dostaneš třeba 50 bodů, za spojené 4 třeba 80, to je jedno. A prostě za víc prostě nějak se to, nějak se prostě snažím prostě adekvátně body snažit, čím víc toho spojíš, tím líp. Klasika prostě spoj 3 mechanismus, jo. V čem je to ale zajímavé, je to, že se to spojí se stylem hry Balatro. A to následovně. Vždycky máš jako kdyby misi. Začínáš a tvým úkolem je nazbírat určité množství, určité množství skóre, prostě nějaké skóre a máš na to v podstatě čas. A nebo i tahy, nevím, to tady to je takový. Hele jo, asi jo, asi máš prostě čas a tahy. Běží ti čas a tahy a ty musíš získat nějaké skóre, jo. A teď, když ho prostě získáš, tak level 1 dan. A naráže ti nabídne nějaké vylepšení, jo. A teďka ty si rozhoduješ vlastně, jak budeš tu hru hrát dál. A řekneš si, hmm, vylepšení. Tak co třeba, že si vylepším, že mám víc času. Nebo si vybereš, hmm, vylepšení. Co si třeba vylepšit, to, že mám víc tahů. A nebo zajímavější, co si třeba vylepšit to, že když spojím zelené, tak mám víc skóre. A nebo, hmm, co třeba si vylepšit, spojím-li jako posobě dvě stejné barvy, jako když spojím třeba zelené a pak zase zelené, tak mám nějaký multiplayer skóre. A prostě naráže ti jako kdyby začne stavět v podstatě jako balatr, nějaký jako kdyby komba. A ty se vlastně tak snažíš jako kdyby postoupit co nejdál. Vtip je v tom, že po každé tému kole se ti zvýší, kolik skóre musíš pro tuhle daného levelu dál udělat. Jo, a je to prostě takovej ten balatro styl, že se to zvýší třeba úplně jako až. Ale zároveň máš nějaké komba, které je úplně nefér. Takže naraz prostě ta hra začne být taková jako dynamická, no ale samozřejmě to nedá živo. Třeba, nevím, no záleží prostě, jo. Jako pořád jakože ta hra může být v tom, že to by se může podařit, jo, že se to dynamicky zvýšení, ta hra v podstatě nejde dohrát, ale tím kolem je nazbírat co nejvyšší score v momentě, kdy jakoby skončíš, a skončit můžeš tak, že ti dojde čas, anebo ty tahy, jo. Tak prostě se zapíše tvoje score, jako kdyby ne jako dohromady score, ale, nebo možná jo, možná dohromady. Já nevím. Zapíše se prostě score a v kolikátém levelu jsi byl. Ale asi bychom mohli zapsat buď jako score dohromady, co nazbíral celou dobu, tak i score, které jsi nahrál v tom posledním levelu, ve kterém jsi byl, jo, a v jakém levelu jsi byl. A to se ti prostě uloží, takže můžeš jako kdyby pak takhle soutěžit. Haló, haló.
+
+Haló, haló 👀 slyším tě dobře — a tohle je fakt dobrej nápad. Upřímně: máš tam potenciál na něco, co může být návykové jak prase (to spojení „spoj 3 + buildy jako v Balatru“ je přesně ten typ hybridu, co funguje).
+
+Pojďme to trochu „ukotvit“, aby ses z brainstormu dostal k realizaci.
+
+🧠 Core myšlenka (zjednodušeně)
+👉 Match-3 + roguelike buildy
+
+hraješ klasický spoj 3
+
+máš:
+
+⏱ čas
+
+🎯 tahy
+
+🎯 target score
+
+splníš → postup do dalšího levelu
+
+po každém levelu si vybereš upgrade
+
+difficulty roste (target score ↑)
+
+jednou skončíš → zapíše se run
+
+👉 To je vlastně:
+
+Candy Crush × Balatro × Vampire Survivors progression
+
+🔥 Co je na tom nejsilnější
+Tohle jsou tvoje „gold nuggety“ – nesahej na ně:
+
+1. Buildy (nejdůležitější věc)
+To je to, co z toho dělá hru, ne jen klon.
+
+Např:
+
++50 % score za zelené
+
+combo multiplier (stejná barva za sebou)
+
++1 tah za match 4+
+
+zpomalení času při velkém kombu
+
+spawn speciálních kamenů
+
+👉 hráč si tvoří strategii:
+
+„jedu zelenou build“ vs „jedu combo build“
+
+2. Escalace obtížnosti
+target score roste exponenciálně
+
+hráč má broken buildy → chvíli je OP → pak zase struggle
+
+👉 přesně ten Balatro feeling:
+
+„tohle už nedám… wait… dal jsem to 😳“
+
+3. Run-based hra
+jedna hra = run
+
+konec = leaderboard / skóre
+
+👉 ideální na mobil:
+
+krátké session
+
+„ještě jeden pokus“
+
+⚙️ Doporučení (důležité rozhodnutí)
+🟡 1. Čas vs tahy → NE OBOJÍ
+Tohle je důležitý:
+
+👉 Pokud dáš:
+
+čas + tahy = chaos
+
+👉 Doporučuju:
+
+buď:
+
+🎯 jen tahy (víc strategické)
+
+nebo:
+
+⏱ jen čas (víc akční)
+
+👉 můj tip:
+➡️ jen tahy (lepší pro buildy a kontrolu)
+
+🟡 2. Grid velikost
+ideál: 8x8
+
+mobil friendly
+
+klasika → hráči to znají
+
+🟡 3. Match systém
+Začni jednoduše:
+
+3 = base score
+
+4 = bonus + speciální kámen
+
+5 = velký efekt
+
+🧪 Návrh prvních upgradeů (MVP set)
+Začni s cca 10–15 upgrady:
+
+🎯 Score build
++50 % score za modré
+
++100 % za 4+ match
+
+🔁 Combo build
+multiplier za stejnou barvu po sobě
+
+combo nezmizí hned
+
+⚡ Economy build
++2 tahy po levelu
+
++1 tah za velký match
+
+🎲 Chaos build
+náhodný bonus při matchi
+
+šance na dvojité body
+
+👉 klíč:
+musí se dát kombinovat → vznikají broken buildy
+
+🏗️ Jak to postavit (technicky)
+Ty chceš PWA → super volba.
+
+Stack (doporučuju):
+React / Next.js
+
+Canvas nebo DOM grid
+
+localStorage (zatím)
+
+Architektura:
+1. Game loop
+stav gridu
+
+kontrola matchů
+
+animace → refill
+
+2. Run state
+aktuální level
+
+score
+
+upgrady (array)
+
+3. Upgrade system
+{
+  id: "green_bonus",
+  effect: (state) => {...}
+}
+🚀 MVP plán (fakt důležitý)
+Nepřepal to.
+
+🔹 Krok 1
+grid
+
+match 3
+
+padání kamenů
+
+🔹 Krok 2
+score
+
+tahy
+
+🔹 Krok 3
+level → target score
+
+🔹 Krok 4
+3 upgrady (jen 3!)
+
+🔹 Krok 5
+výběr upgradu po levelu
+
+👉 a máš hratelnou hru
+
+🧠 Co bych přidal později (high impact)
+🔥 speciální kameny (exploze, řádky)
+
+🧠 synergie (upgrade A + B = OP)
+
+📊 leaderboard
+
+🎨 juice (animace → důležité!)
+
+💡 Název (jen tak střelba)
+ComboForge
+
+MatchRun
+
+GemBreak Roguelike
+
+Chain Reactor
+
+Combo Dungeon
+
+⚠️ Největší riziko
+👉 že to bude „jen Candy Crush“
+
+Řešení:
+➡️ upgrade systém musí být brutálně zajímavý
+
+👉 Další krok
+Jestli chceš, můžeme teď udělat:
+
+konkrétní seznam 20 upgradeů
+
+datový model (jak to uložit)
+
+první verzi kódu (grid + match engine)
+
+nebo UI návrh mobilní obrazovky
+
+Upřímně — tohle je jeden z lepších nápadů, co jsi tu měl.
+Jestli to uděláš dobře, má to fakt šanci být návyková indie hitovka.
+
+👉 Kam chceš jít dál?
+
+
+
+

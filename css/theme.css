@@ -1,0 +1,100 @@
+:root {
+  /* Colors */
+  --bg: #050a0e;
+  --grid-bg: #0a1520;
+  --panel-bg: #0d1e2e;
+  --border: #1a3a5c;
+  --neon-cyan: #00fff9;
+  --neon-purple: #bf5af2;
+  --neon-green: #39ff14;
+  --neon-red: #ff2d55;
+  --neon-yellow: #ffd60a;
+  --neon-orange: #ff6b00;
+  --text: #c8e6f5;
+  --text-dim: #4a7a9b;
+  
+  /* Typography */
+  --font: 'JetBrains Mono', monospace;
+}
+
+/* Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  overflow: hidden;
+  height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Utility Classes */
+.glow-cyan { text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan); }
+.glow-purple { text-shadow: 0 0 8px var(--neon-purple); }
+.glow-green { text-shadow: 0 0 8px var(--neon-green); }
+.glow-red { text-shadow: 0 0 8px var(--neon-red); }
+
+/* Scanline Overlay */
+.scanline-overlay::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(200, 230, 245, 0.03) 0px,
+    rgba(200, 230, 245, 0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanline 8s linear infinite;
+}
+
+/* Animations */
+@keyframes pulse-cyan {
+  from { text-shadow: 0 0 4px var(--neon-cyan), 0 0 8px var(--neon-cyan); }
+  to { text-shadow: 0 0 8px var(--neon-cyan), 0 0 16px var(--neon-cyan); }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); filter: hue-rotate(0deg); }
+  33% { transform: translate(-2px, 1px); filter: hue-rotate(90deg); }
+  66% { transform: translate(2px, -1px); filter: hue-rotate(180deg); }
+  100% { transform: translate(0); filter: hue-rotate(360deg); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes data-fall {
+  0% { transform: translateY(-20px); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
