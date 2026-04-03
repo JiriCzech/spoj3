@@ -163,7 +163,14 @@ function handleTap(row, col) {
     if (!sel) {
         STATE.selectedTile = { row, col };
         const el = getTileEl(row, col);
-        if (el) el.classList.add('selected');
+        if (el) {
+            el.classList.add('selected');
+            if (window.Audio) window.Audio.select();
+            const rip = document.createElement('div');
+            rip.className = 'tile-ripple';
+            el.appendChild(rip);
+            setTimeout(() => { if (rip.parentNode) rip.remove(); }, 500);
+        }
         return;
     }
 
@@ -184,7 +191,14 @@ function handleTap(row, col) {
     } else {
         STATE.selectedTile = { row, col };
         const el = getTileEl(row, col);
-        if (el) el.classList.add('selected');
+        if (el) {
+            el.classList.add('selected');
+            if (window.Audio) window.Audio.select();
+            const rip = document.createElement('div');
+            rip.className = 'tile-ripple';
+            el.appendChild(rip);
+            setTimeout(() => { if (rip.parentNode) rip.remove(); }, 500);
+        }
     }
 }
 
@@ -283,6 +297,7 @@ function playInvalid(row, col) {
     const el = getTileEl(row, col);
     if (!el) return;
     el.classList.add('invalid');
+    if (window.Audio) window.Audio.invalid();
     setTimeout(() => el.classList.remove('invalid'), 400);
 }
 
@@ -404,6 +419,19 @@ async function processMatches(matchedTiles, depth = 0) {
     const base = calculateMatchScore(matchedTiles);
     const final = window.applyMatchScore ? window.applyMatchScore(base, matchedTiles) : base;
     STATE.hackProgress = Math.min(STATE.hackTarget, STATE.hackProgress + final);
+    
+    if (window.Audio) {
+        if (matchedTiles.length >= 5) window.Audio.bigMatch();
+        else window.Audio.match();
+    }
+    
+    showMatchScore(final, matchedTiles);
+    
+    if (STATE.comboCount >= 1 && window.hasUpgrade('combo_multiplier')) {
+        showComboIndicator(STATE.comboCount + 1);
+        if (window.Audio) window.Audio.combo();
+    }
+    
     updateHackBar();
 
     // Step 3: Remove from data
@@ -439,6 +467,30 @@ async function processMatches(matchedTiles, depth = 0) {
     const newMatches = findMatches();
     if (newMatches.length > 0) {
         STATE.currentCascadeDepth = (STATE.currentCascadeDepth || 0) + 1;
+        if (window.Audio) window.Audio.cascade();
+        
+        const gridEl = document.getElementById('game-grid');
+        if (gridEl) {
+            const rect = gridEl.getBoundingClientRect();
+            const textEl = document.createElement('div');
+            textEl.textContent = `CASCADE ×${STATE.currentCascadeDepth}`;
+            textEl.style.position = 'fixed';
+            textEl.style.left = '50%';
+            textEl.style.top = `${rect.top}px`;
+            textEl.style.transform = 'translate(-50%, -20px)';
+            textEl.style.fontSize = '13px';
+            textEl.style.color = 'var(--neon-orange)';
+            textEl.style.letterSpacing = '3px';
+            textEl.style.fontWeight = '700';
+            textEl.style.fontFamily = 'var(--font)';
+            textEl.style.textShadow = '0 0 10px var(--neon-orange)';
+            textEl.style.zIndex = '300';
+            textEl.style.animation = 'float-up 0.8s ease forwards';
+            textEl.style.pointerEvents = 'none';
+            document.body.appendChild(textEl);
+            setTimeout(() => { if (textEl.parentNode) textEl.remove(); }, 800);
+        }
+        
         await processMatches(newMatches, depth + 1);
     }
 }
@@ -476,7 +528,15 @@ function updateHackBar() {
     if (fill) {
         fill.style.width = pct + '%';
         fill.classList.toggle('bar-hot', pct >= 80);
+        fill.classList.toggle('bar-complete', pct >= 100);
+        
+        if (pct - (STATE._lastHackPercent || 0) > 15) {
+            if (fill.animate) {
+                fill.animate([{ filter: 'brightness(2)' }, { filter: 'brightness(1)' }], { duration: 400 });
+            }
+        }
     }
+    STATE._lastHackPercent = pct;
 
     const label = document.getElementById('hack-bar-label');
     if (label) label.textContent = `HACK PROGRESS: ${Math.floor(pct)}%`;
@@ -484,7 +544,11 @@ function updateHackBar() {
     const movesEl = document.getElementById('hack-bar-moves');
     if (movesEl) {
         movesEl.textContent = `MOVES: ${S.moves}`;
-        movesEl.classList.toggle('danger', S.moves <= 5);
+        movesEl.classList.toggle('moves-danger', S.moves <= 5);
+        if (S.moves <= 3 && !movesEl.classList.contains('shake')) {
+            movesEl.classList.add('shake');
+            setTimeout(() => movesEl.classList.remove('shake'), 400);
+        }
     }
 
     const eurosEl = document.getElementById('hud-euros');
@@ -505,6 +569,7 @@ async function checkContractState() {
         document.body.appendChild(flash);
         await sleep(800);
         if (flash.parentNode) flash.remove();
+        if (window.Audio) window.Audio.hackComplete();
 
         const moveBonus = S.upgradeFlags?.efficientRunner ? 25 : 15;
         const unusedMovesBonus = S.moves * moveBonus;
@@ -557,6 +622,65 @@ function showFloatingText(text, color) {
     el.style.pointerEvents = 'none';
     document.body.appendChild(el);
     setTimeout(() => { if (el.parentNode) el.remove(); }, 1200);
+}
+
+function showMatchScore(score, tiles) {
+    if (!tiles || tiles.length === 0) return;
+    const centerTile = tiles[Math.floor(tiles.length / 2)];
+    const el = getTileEl(centerTile.row, centerTile.col);
+    if (!el) return;
+    
+    const rect = el.getBoundingClientRect();
+    const floatEl = document.createElement('div');
+    
+    let text = `+${score}`;
+    let color = 'var(--neon-cyan)';
+    let size = '14px';
+    
+    if (score > 150) text = `⚡ +${score}`;
+    if (score > 300) { color = 'var(--neon-yellow)'; size = '17px'; }
+    if (score > 600) { color = 'var(--neon-green)'; size = '20px'; text = `🔥 +${score}`; }
+    
+    floatEl.textContent = text;
+    floatEl.style.position = 'fixed';
+    floatEl.style.left = `${rect.left + rect.width / 2}px`;
+    floatEl.style.top = `${rect.top + rect.height / 2}px`;
+    floatEl.style.transform = 'translate(-50%, -50%)';
+    floatEl.style.color = color;
+    floatEl.style.fontSize = size;
+    floatEl.style.fontWeight = '700';
+    floatEl.style.letterSpacing = '2px';
+    floatEl.style.fontFamily = 'var(--font)';
+    floatEl.style.textShadow = `0 0 10px ${color}`;
+    floatEl.style.zIndex = '200';
+    floatEl.style.pointerEvents = 'none';
+    floatEl.style.whiteSpace = 'nowrap';
+    floatEl.style.animation = 'float-up 1s ease forwards';
+    
+    document.body.appendChild(floatEl);
+    setTimeout(() => { if (floatEl.parentNode) floatEl.remove(); }, 1000);
+}
+
+function showComboIndicator(count) {
+    const el = document.createElement('div');
+    el.textContent = `COMBO ×${count}`;
+    el.style.position = 'fixed';
+    el.style.left = '50%';
+    el.style.top = '30%';
+    el.style.transform = 'translate(-50%, -50%)';
+    el.style.color = 'var(--neon-purple)';
+    el.style.fontSize = '22px';
+    el.style.fontWeight = '700';
+    el.style.letterSpacing = '4px';
+    el.style.fontFamily = 'var(--font)';
+    el.style.textShadow = '0 0 20px var(--neon-purple)';
+    el.style.zIndex = '300';
+    el.style.pointerEvents = 'none';
+    el.style.whiteSpace = 'nowrap';
+    el.style.animation = 'combo-pop 0.85s ease forwards';
+    
+    document.body.appendChild(el);
+    setTimeout(() => { if (el.parentNode) el.remove(); }, 850);
 }
 
 // =====================================================

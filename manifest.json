@@ -26,5 +26,13 @@
       "type": "image/png",
       "purpose": "any"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Run",
+      "short_name": "Play",
+      "url": "/?play=1",
+      "description": "Start a new hacking run"
+    }
   ]
 }

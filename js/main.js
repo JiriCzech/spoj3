@@ -9,10 +9,21 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 // CORE: Screen Switcher
 // =====================================================
 function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const active = document.querySelector('.screen.active');
     const target = document.getElementById(`screen-${screenId}`);
-    if (target) {
-        target.classList.add('active');
+    
+    if (active && active !== target) {
+        active.classList.add('screen-exit');
+        setTimeout(() => {
+            active.classList.remove('active', 'screen-exit');
+            if (target) {
+                target.classList.add('active', 'screen-enter');
+                setTimeout(() => target.classList.remove('screen-enter'), 250);
+            }
+        }, 200);
+    } else if (target) {
+        target.classList.add('active', 'screen-enter');
+        setTimeout(() => target.classList.remove('screen-enter'), 250);
     } else {
         console.warn(`[NETRUNNER] Screen not found: ${screenId}`);
     }
@@ -124,6 +135,19 @@ function initMenuScreen() {
         setTimeout(() => stats.classList.remove('flash'), 600);
         renderMenuStats();
     };
+
+    // A2HS Prompt
+    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: minimal-ui)').matches;
+    if (!isStandalone && !localStorage.getItem('netrunner_install_dismissed')) {
+        const a2hs = document.createElement('div');
+        a2hs.style.cssText = 'position:fixed;bottom:0;width:100%;background:var(--panel-bg);border-top:1px solid var(--border);padding:10px 16px;font-size:11px;color:var(--text-dim);letter-spacing:1px;display:flex;justify-content:space-between;z-index:500';
+        a2hs.innerHTML = '<span>Add to Home Screen for best experience</span><span style="padding:0 8px;cursor:pointer">✕</span>';
+        a2hs.querySelector('span:last-child').onclick = () => {
+            localStorage.setItem('netrunner_install_dismissed', '1');
+            a2hs.remove();
+        };
+        document.body.appendChild(a2hs);
+    }
 }
 
 function renderMenuStats() {
@@ -180,6 +204,12 @@ function initContractScreen() {
         });
     });
 
+    const hackFill = document.querySelector('.contract-details .hack-bar-fill');
+    if (hackFill) {
+        hackFill.style.animation = 'bar-scan 0.6s ease forwards';
+        setTimeout(() => { if (hackFill) hackFill.style.animation = ''; }, 600);
+    }
+
     document.getElementById('btn-execute').onclick = () => {
         showScreen('game');
         initGameScreen();
@@ -209,6 +239,48 @@ function initGameScreen() {
     if (typeof window.startGame === 'function') {
         window.startGame();
     }
+
+    // Blackout Button
+    const oldBtn = document.getElementById('blackout-btn');
+    if (oldBtn) oldBtn.remove();
+    
+    if (window.hasUpgrade && window.hasUpgrade('blackout') && !(S.upgradeFlags && S.upgradeFlags.blackoutUsed)) {
+        const btn = document.createElement('button');
+        btn.id = 'blackout-btn';
+        btn.className = 'btn';
+        btn.textContent = '⚡ BLACKOUT';
+        btn.style.cssText = 'width:auto;margin-top:8px;padding:10px 24px;color:var(--neon-red);border-color:var(--neon-red);font-size:12px;letter-spacing:3px;box-shadow:0 0 12px rgba(255,45,85,0.3)';
+        
+        btn.onclick = () => {
+            if (!S.grid) return;
+            // Count colors
+            const counts = {};
+            S.grid.forEach(row => row.forEach(tile => {
+                if (tile && tile.color) counts[tile.color] = (counts[tile.color] || 0) + 1;
+            }));
+            let topColor = null, max = 0;
+            for (const c in counts) {
+                if (counts[c] > max) { max = counts[c]; topColor = c; }
+            }
+            if (topColor) {
+                btn.disabled = true;
+                btn.style.opacity = '0.3';
+                btn.style.pointerEvents = 'none';
+                if (!S.upgradeFlags) S.upgradeFlags = {};
+                S.upgradeFlags.blackoutUsed = true;
+                
+                const targets = [];
+                for (let r=0; r<S.GRID_SIZE; r++) {
+                    for (let c=0; c<S.GRID_SIZE; c++) {
+                        if (S.grid[r][c] && S.grid[r][c].color === topColor) targets.push({row:r, col:c, color:topColor});
+                    }
+                }
+                if (targets.length > 0 && typeof processMatches === 'function') processMatches(targets);
+            }
+        };
+        const wrapper = document.querySelector('.grid-wrapper');
+        if (wrapper) wrapper.appendChild(btn);
+    }
 }
 window.initGameScreen = initGameScreen;
 
@@ -221,18 +293,15 @@ function initShopScreen(earnedAmount) {
 
     // Animate euro counter
     const display = document.getElementById('shop-euros-display');
-    const startVal = S.eurodollars;
-    const endVal = startVal + earnedAmount;
-    S.eurodollars = endVal;
-    S.totalEurodollars = (S.totalEurodollars || 0) + earnedAmount;
-    S.runScore = (S.runScore || 0) + earnedAmount;
+    const endVal = S.eurodollars;
+    const startDisplay = endVal - earnedAmount;
 
     if (earnedAmount > 0 && !REDUCED_MOTION) {
         const startTime = performance.now();
         const duration = 800;
         function tick(now) {
             const t = Math.min((now - startTime) / duration, 1);
-            const current = Math.floor(startVal + (endVal - startVal) * t);
+            const current = Math.floor(startDisplay + (endVal - startDisplay) * t);
             if (display) display.textContent = `€€ ${current}`;
             if (t < 1) requestAnimationFrame(tick);
         }
@@ -296,6 +365,7 @@ window.initShopScreen = initShopScreen;
 window.handleBuyUpgrade = function(upgradeId, buttonEl) {
     const success = window.buyUpgrade(upgradeId);
     if (success) {
+        if (window.Audio) window.Audio.buy();
         const card = buttonEl.closest('.shop-card');
         card.classList.add('purchased');
         document.getElementById('shop-euros-display').textContent = '€€ ' + window.STATE.eurodollars;
@@ -316,10 +386,19 @@ window.handleBuyUpgrade = function(upgradeId, buttonEl) {
     }
 }
 
+window.toggleSound = function() {
+    if (window.Audio) {
+        const on = window.Audio.toggle();
+        const btn = document.getElementById('sound-toggle');
+        if (btn) btn.textContent = on ? '🔊' : '🔇';
+    }
+}
+
 // =====================================================
 // SCREEN: GAME OVER
 // =====================================================
 function showGameOver(reason) {
+    if (window.Audio) window.Audio.gameOver();
     reason = reason || 'OUT OF MOVES';
 
     if (window.saveBestRun) window.saveBestRun();
@@ -379,8 +458,14 @@ window.showGameOver = showGameOver;
 // =====================================================
 // ENTRY POINT
 // =====================================================
+// =====================================================
 document.addEventListener('DOMContentLoaded', () => {
+    function fixVh() {
+        document.documentElement.style.setProperty('--real-vh', window.innerHeight * 0.01 + 'px');
+    }
+    fixVh();
+    window.addEventListener('resize', fixVh);
+
     if (window.loadBestRun) window.loadBestRun();
-    console.log('[NETRUNNER] System online.');
     runBootSequence();
 });

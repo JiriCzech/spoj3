@@ -691,6 +691,9 @@
   text-shadow: 0 0 6px var(--neon-red);
 }
 
+.moves-danger { color: var(--neon-red) !important; text-shadow: 0 0 8px var(--neon-red) !important; }
+.moves-danger.shake { animation: shake 0.35s ease; }
+
 /* Tile falling animation */
 .tile.falling {
   animation: tile-drop 0.28s ease-out;
@@ -730,4 +733,71 @@
   30%  { opacity: 1; }
   70%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* ===========================
+   PWA & JUICE UPDATES
+   =========================== */
+
+/* Touch interactions */
+#game-grid {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Screen Transitions */
+.screen-exit { animation: screenExit 0.2s ease forwards; }
+.screen-enter { animation: screenEnter 0.25s ease forwards; }
+@keyframes screenExit { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes screenEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Contract bar scan */
+@keyframes bar-scan { 0%{width:0%} 50%{width:30%} 100%{width:0%} }
+
+/* Hack bar complete */
+.hack-bar-fill.bar-complete {
+  background: linear-gradient(90deg, #39ff14, #00fff9);
+  box-shadow: 0 0 20px rgba(57,255,20,0.8);
+  animation: pulse-green 0.5s ease infinite;
+}
+
+/* Combo pop */
+@keyframes combo-pop {
+  0%   { transform: translateX(-50%) scale(1.5); opacity: 0; }
+  20%  { transform: translateX(-50%) scale(1.0); opacity: 1; }
+  70%  { transform: translateX(-50%) scale(1.0); opacity: 1; }
+  100% { transform: translateX(-50%) scale(0.9); opacity: 0; }
+}
+
+/* Tile ripple */
+.tile-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--neon-cyan);
+  opacity: 1;
+  transform: scale(1);
+  animation: tile-ripple-out 0.5s ease forwards;
+}
+
+@keyframes tile-ripple-out {
+  0%   { transform: scale(1);    opacity: 0.8; }
+  100% { transform: scale(1.6);  opacity: 0; }
+}
+
+/* Mobile optimizations */
+@media (max-height: 680px) {
+  .hud { height: 48px; }
+  .hud-value { font-size: 13px; }
+  .hack-bar-container { padding: 5px 12px; }
+  .hack-bar-track { height: 10px; }
+  .grid-wrapper { padding: 4px; }
+  .game-grid { gap: 2px; }
+  .tile-icon { font-size: clamp(11px, 3vw, 17px); }
+}
+
+@media (max-height: 580px) {
+  .hud-label { display: none; }
+  .game-grid { gap: 1px; }
 }
