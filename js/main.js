@@ -205,7 +205,7 @@ function initGameScreen() {
     if (fillEl) fillEl.style.width = '0%';
     if (movesEl) movesEl.textContent = `MOVES: ${S.moves}`;
 
-    // Engine will take over from here once engine.js is implemented
+    // Delegate to game engine
     if (typeof window.startGame === 'function') {
         window.startGame();
     }

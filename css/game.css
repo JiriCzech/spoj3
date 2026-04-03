@@ -584,3 +584,65 @@
   min-height: 20px;
 }
 
+/* ===========================
+   ENGINE — DYNAMIC STATES
+   =========================== */
+
+/* Hot hack bar */
+.hack-bar-fill.bar-hot {
+  background: var(--neon-green);
+  box-shadow: 0 0 12px var(--neon-green);
+  animation: pulse-green 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-green {
+  from { box-shadow: 0 0 6px var(--neon-green); }
+  to   { box-shadow: 0 0 18px var(--neon-green), 0 0 30px var(--neon-green); }
+}
+
+/* Danger moves */
+.hack-bar-label.danger {
+  color: var(--neon-red);
+  text-shadow: 0 0 6px var(--neon-red);
+}
+
+/* Tile falling animation */
+.tile.falling {
+  animation: tile-drop 0.28s ease-out;
+}
+
+@keyframes tile-drop {
+  from { transform: translateY(-40px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* Grid glitch on lose */
+.game-grid.grid-glitch {
+  animation: glitch 0.12s steps(1) 5;
+}
+
+/* Access granted fullscreen flash */
+.access-granted-flash {
+  position: fixed;
+  inset: 0;
+  background: rgba(57, 255, 20, 0.12);
+  z-index: 1000;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  letter-spacing: 6px;
+  color: var(--neon-green);
+  font-weight: 700;
+  font-family: var(--font);
+  text-shadow: 0 0 20px var(--neon-green);
+  animation: fadeInOut 0.8s ease forwards;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
