@@ -234,6 +234,15 @@ async function trySwap(r1, c1, r2, c2) {
         // Step 2: Sync DOM (updates color instantly; CSS transition handles physics)
         updateTileDOM(r1, c1);
         updateTileDOM(r2, c2);
+        
+        const el1 = getTileEl(r1, c1);
+        const el2 = getTileEl(r2, c2);
+        if (el1) el1.classList.add('tile-swap');
+        if (el2) el2.classList.add('tile-swap');
+        setTimeout(() => {
+            if (el1) el1.classList.remove('tile-swap');
+            if (el2) el2.classList.remove('tile-swap');
+        }, 250);
 
         // Step 3: Check for matches
         const matches = findMatches();
@@ -392,7 +401,7 @@ async function processMatches(matchedTiles, depth = 0) {
     // Step 1: Flash
     matchedTiles.forEach(({ row, col }) => {
         const el = getTileEl(row, col);
-        if (el) el.classList.add('matched');
+        if (el) el.classList.add('matched', 'tile-explode');
     });
     await sleep(350);
 
@@ -418,10 +427,23 @@ async function processMatches(matchedTiles, depth = 0) {
     // Step 3: Remove from data
     matchedTiles.forEach(({ row, col }) => { STATE.grid[row][col] = null; });
 
+    // Track data before gravity for falling animation
+    const oldGrid = STATE.grid.map(row => [...row]);
+
     // Step 4: Gravity
     applyGravity();
 
-    // Track null positions before refill (for falling animation)
+    // Determine which tiles fell by comparing object references
+    const fellSlots = [];
+    for (let r = 0; r < STATE.GRID_SIZE; r++) {
+        for (let c = 0; c < STATE.GRID_SIZE; c++) {
+            if (STATE.grid[r][c] !== null && oldGrid[r][c] !== STATE.grid[r][c]) {
+                fellSlots.push({ r, c });
+            }
+        }
+    }
+
+    // Track null positions before refill (for dropping new tiles)
     const newSlots = [];
     for (let r = 0; r < STATE.GRID_SIZE; r++)
         for (let c = 0; c < STATE.GRID_SIZE; c++)
@@ -433,12 +455,20 @@ async function processMatches(matchedTiles, depth = 0) {
     // Step 6: Sync DOM
     syncGridDOM();
 
-    // Animate new tiles
+    // Animate new tiles and falling tiles
     newSlots.forEach(({ r, c }) => {
         const el = getTileEl(r, c);
         if (el) {
-            el.classList.add('falling');
-            setTimeout(() => el.classList.remove('falling'), 350);
+            el.classList.add('tile-drop');
+            setTimeout(() => { if (el) el.classList.remove('tile-drop'); }, 350);
+        }
+    });
+
+    fellSlots.forEach(({ r, c }) => {
+        const el = getTileEl(r, c);
+        if (el) {
+            el.classList.add('tile-fall');
+            setTimeout(() => { if (el) el.classList.remove('tile-fall'); }, 280);
         }
     });
 
@@ -558,6 +588,16 @@ async function checkContractState() {
 
         const moveBonus = S.upgradeFlags?.efficientRunner ? 25 : 15;
         const unusedMovesBonus = S.moves * moveBonus;
+
+        clearInterval(STATE.timerInterval);
+        STATE.timerInterval = null;
+
+        for (let i = 0; i < (S.activeUpgrades || []).length; i++) {
+            const upgrade = S.activeUpgrades[i];
+            if (typeof upgrade.applyOnContractEnd === 'function') {
+                upgrade.applyOnContractEnd(STATE);
+            }
+        }
         
         let earned = S.contractReward + unusedMovesBonus;
         if (S.upgradeFlags?.doubleEuros) earned *= 2;
@@ -668,6 +708,54 @@ function showComboIndicator(count) {
     document.body.appendChild(el);
     setTimeout(() => { if (el.parentNode) el.remove(); }, 850);
 }
+
+// =====================================================
+// TIMER
+// =====================================================
+function startContractTimer() {
+    if (STATE.timerInterval) clearInterval(STATE.timerInterval);
+    STATE.timerInterval = setInterval(() => {
+        if (isProcessing) return; // pause during cascade
+        if (STATE.upgradeFlags?.timerFrozen) return;
+        STATE.timeLeft--;
+        updateTimerDisplay();
+        if (STATE.timeLeft <= 0) {
+            clearInterval(STATE.timerInterval);
+            STATE.timerInterval = null;
+            handleTimeOut();
+        }
+    }, 1000);
+}
+
+function updateTimerDisplay() {
+    const el = document.getElementById('hud-timer');
+    if (!el) return;
+    const mins = Math.floor(STATE.timeLeft / 60);
+    const secs = STATE.timeLeft % 60;
+    el.textContent = mins + ':' + String(secs).padStart(2, '0');
+    el.classList.remove('danger', 'timer-warning');
+    if (STATE.timeLeft <= 10) {
+        el.classList.add('danger');
+        if (STATE.timeLeft <= 10 && STATE.timeLeft % 2 === 0) {
+            el.classList.add('timer-warning');
+        }
+    } else if (STATE.timeLeft <= 20) {
+        el.classList.add('timer-warning');
+    }
+}
+
+function handleTimeOut() {
+    if (window.Audio) window.Audio.gameOver();
+    // Brief screen flash
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:fixed;inset:0;background:rgba(255,45,85,0.15);z-index:100;pointer-events:none;animation:fadeInOut 0.6s ease forwards';
+    document.body.appendChild(flash);
+    setTimeout(() => { if (flash.parentNode) flash.remove(); }, 600);
+    setTimeout(() => { if (window.showGameOver) window.showGameOver('CONNECTION TIMED OUT'); }, 650);
+}
+
+window.startContractTimer = startContractTimer;
+window.handleTimeOut = handleTimeOut;
 
 // =====================================================
 // START (called from main.js initGameScreen)

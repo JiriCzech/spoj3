@@ -308,6 +308,65 @@
   z-index: 1;
 }
 
+/* === NEW ANIMATIONS === */
+
+.tile-swap {
+  animation: tileSwap 0.22s ease;
+}
+@keyframes tileSwap {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.82); }
+  100% { transform: scale(1); }
+}
+
+.tile-explode {
+  animation: tileExplode 0.32s ease forwards;
+}
+@keyframes tileExplode {
+  0%   { transform: scale(1);    opacity: 1; filter: brightness(1); }
+  50%  { transform: scale(1.28); opacity: 1; filter: brightness(2.5); }
+  100% { transform: scale(0);    opacity: 0; filter: brightness(3); }
+}
+
+.tile-drop {
+  animation: tileDrop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes tileDrop {
+  0%   { transform: translateY(-24px) scale(0.7); opacity: 0; }
+  100% { transform: translateY(0)     scale(1);   opacity: 1; }
+}
+
+.tile-fall {
+  animation: tileFall 0.25s ease-in forwards;
+}
+@keyframes tileFall {
+  0%   { transform: translateY(-12px); }
+  100% { transform: translateY(0); }
+}
+
+.tile.selected {
+  animation: selectedPulse 1s ease infinite;
+}
+@keyframes selectedPulse {
+  0%, 100% { box-shadow: 0 0 0 1px #00fff9, 0 0 10px rgba(0,255,249,0.4); }
+  50%      { box-shadow: 0 0 0 2px #00fff9, 0 0 20px rgba(0,255,249,0.7); }
+}
+
+.hud-value.timer-warning {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px var(--neon-yellow);
+  animation: timerPulse 1s ease infinite;
+}
+.hud-value.danger {
+  color: var(--neon-red) !important;
+  text-shadow: 0 0 10px var(--neon-red);
+  animation: timerPulse 0.5s ease infinite;
+}
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
 .rain-col {
   position: absolute;
   top: -100%;

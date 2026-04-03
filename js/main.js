@@ -253,6 +253,9 @@ function initGameScreen() {
         window.startGame();
     }
 
+    if (typeof window.updateTimerDisplay === 'function') window.updateTimerDisplay();
+    if (typeof window.startContractTimer === 'function') window.startContractTimer();
+
     // Blackout Button
     const oldBtn = document.getElementById('blackout-btn');
     if (oldBtn) oldBtn.remove();
@@ -293,6 +296,33 @@ function initGameScreen() {
         };
         const wrapper = document.querySelector('.grid-wrapper');
         if (wrapper) wrapper.appendChild(btn);
+    }
+
+    const oldFreezeBtn = document.getElementById('freeze-btn');
+    if (oldFreezeBtn) oldFreezeBtn.remove();
+
+    if (window.hasUpgrade && window.hasUpgrade('time_freeze') && !(S.upgradeFlags && S.upgradeFlags.timeFreezeUsed)) {
+        const freezeBtn = document.createElement('button');
+        freezeBtn.id = 'freeze-btn';
+        freezeBtn.className = 'btn';
+        freezeBtn.textContent = '❄ FREEZE TIMER';
+        freezeBtn.style.cssText = 'width:auto;margin-top:6px;padding:10px 24px;color:var(--neon-cyan);border-color:var(--neon-cyan);font-size:12px;letter-spacing:3px;box-shadow:0 0 12px rgba(0,255,249,0.3)';
+        freezeBtn.onclick = () => {
+            if (!S.upgradeFlags) S.upgradeFlags = {};
+            S.upgradeFlags.timeFreezeUsed = true;
+            S.upgradeFlags.timerFrozen = true;
+            freezeBtn.disabled = true;
+            freezeBtn.textContent = '❄ TIMER FROZEN';
+            freezeBtn.style.opacity = '0.5';
+            if (typeof window.showFloatingText === 'function') {
+                window.showFloatingText('TIMER FROZEN — 20s', 'cyan');
+            }
+            setTimeout(() => {
+                if (S.upgradeFlags) S.upgradeFlags.timerFrozen = false;
+            }, 20000);
+        };
+        const wrapper = document.querySelector('.grid-wrapper');
+        if (wrapper) wrapper.appendChild(freezeBtn);
     }
 }
 window.initGameScreen = initGameScreen;
@@ -411,6 +441,10 @@ window.toggleSound = function() {
 // SCREEN: GAME OVER
 // =====================================================
 function showGameOver(reason) {
+    if (window.STATE && window.STATE.timerInterval) {
+        clearInterval(window.STATE.timerInterval);
+        window.STATE.timerInterval = null;
+    }
     if (window.Audio) window.Audio.gameOver();
     reason = reason || 'OUT OF MOVES';
 
