@@ -207,39 +207,50 @@ async function trySwap(r1, c1, r2, c2) {
             return;
         }
 
-        // Deduct move
+        // Deduct move optimistically
         STATE.moves--;
         updateHackBar();
 
-        // Animate swap visually
+        // Step 1: Visually animate the swap
         await animateSwap(r1, c1, r2, c2);
 
-        // Swap data
+        // Step 2: Commit data swap + update DOM
         const tmp = STATE.grid[r1][c1];
         STATE.grid[r1][c1] = STATE.grid[r2][c2];
         STATE.grid[r2][c2] = tmp;
         updateTileDOM(r1, c1);
         updateTileDOM(r2, c2);
 
+        // Step 3: Check for matches
         const matches = findMatches();
 
         if (matches.length > 0) {
             await processMatches(matches);
+            await checkContractState();
         } else {
-            // Swap back
-            await animateSwap(r1, c1, r2, c2);
+            // No match — brief pause so player sees the swap
+            await sleep(180);
+
+            // Revert data first (before DOM update)
             const tmp2 = STATE.grid[r1][c1];
             STATE.grid[r1][c1] = STATE.grid[r2][c2];
             STATE.grid[r2][c2] = tmp2;
+
+            // Animate back (data is now original, animate DOM back visually)
+            await animateSwap(r1, c1, r2, c2);
+
+            // Sync DOM to match reverted data
             updateTileDOM(r1, c1);
             updateTileDOM(r2, c2);
+
+            // Refund the move
             STATE.moves++;
             updateHackBar();
+
+            // Shake feedback
             playInvalid(r1, c1);
             playInvalid(r2, c2);
         }
-
-        await checkContractState();
 
     } finally {
         isProcessing = false;

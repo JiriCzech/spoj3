@@ -1,4 +1,4 @@
-const CACHE_NAME = 'netrunner-v1';
+const CACHE_NAME = 'netrunner-v2';
 const ASSETS = [
   '/',
   '/index.html',
