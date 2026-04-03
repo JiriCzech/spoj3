@@ -223,6 +223,9 @@ window.initContractScreen = initContractScreen;
 function initGameScreen() {
     const S = window.STATE;
 
+    S.isProcessing = false;
+    S.currentCascadeDepth = 0;
+
     const lvlEl = document.getElementById('hud-level');
     const clientEl = document.getElementById('hud-client');
     const eurosEl = document.getElementById('hud-euros');
@@ -232,8 +235,18 @@ function initGameScreen() {
     if (lvlEl) lvlEl.textContent = `LVL ${String(S.level).padStart(2, '0')}`;
     if (clientEl) clientEl.textContent = S.contractClient || '---';
     if (eurosEl) eurosEl.textContent = S.eurodollars;
-    if (fillEl) fillEl.style.width = '0%';
+    if (fillEl) {
+        fillEl.style.width = '0%';
+        fillEl.classList.remove('bar-hot', 'bar-complete');
+    }
     if (movesEl) movesEl.textContent = `MOVES: ${S.moves}`;
+
+    const oldGrid = document.getElementById('game-grid');
+    if (oldGrid) {
+        const newGrid = oldGrid.cloneNode(true);
+        newGrid.innerHTML = '';
+        oldGrid.replaceWith(newGrid);
+    }
 
     // Delegate to game engine
     if (typeof window.startGame === 'function') {

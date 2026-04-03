@@ -61,6 +61,7 @@ window.resetRun = function() {
 window.resetContract = function() {
   window.STATE.moves = 25 + (window.STATE.upgradeFlags?.extraMoves || 0);
   window.STATE.hackProgress = 0;
+  window.STATE.isProcessing = false;
   window.STATE.hackTarget = window.hackTargetForLevel(window.STATE.level);
   window.STATE.contractReward = window.contractRewardForLevel(window.STATE.level);
   window.STATE.comboColor = null;

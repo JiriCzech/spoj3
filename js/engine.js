@@ -226,13 +226,12 @@ async function trySwap(r1, c1, r2, c2) {
         STATE.currentCascadeDepth = 0;
         updateHackBar();
 
-        // Step 1: Visually animate the swap
-        await animateSwap(r1, c1, r2, c2);
-
-        // Step 2: Commit data swap + update DOM
+        // Step 1: Swap data
         const tmp = STATE.grid[r1][c1];
         STATE.grid[r1][c1] = STATE.grid[r2][c2];
         STATE.grid[r2][c2] = tmp;
+
+        // Step 2: Sync DOM (updates color instantly; CSS transition handles physics)
         updateTileDOM(r1, c1);
         updateTileDOM(r2, c2);
 
@@ -250,15 +249,12 @@ async function trySwap(r1, c1, r2, c2) {
             // No match — brief pause so player sees the swap
             await sleep(180);
 
-            // Revert data first (before DOM update)
+            // Revert data
             const tmp2 = STATE.grid[r1][c1];
             STATE.grid[r1][c1] = STATE.grid[r2][c2];
             STATE.grid[r2][c2] = tmp2;
 
-            // Animate back (data is now original, animate DOM back visually)
-            await animateSwap(r1, c1, r2, c2);
-
-            // Sync DOM to match reverted data
+            // Sync DOM
             updateTileDOM(r1, c1);
             updateTileDOM(r2, c2);
 
@@ -266,7 +262,7 @@ async function trySwap(r1, c1, r2, c2) {
             STATE.moves++;
             updateHackBar();
 
-            // Shake feedback
+            // Shake feedback (invalid handles removal)
             playInvalid(r1, c1);
             playInvalid(r2, c2);
         }
@@ -276,22 +272,7 @@ async function trySwap(r1, c1, r2, c2) {
     }
 }
 
-async function animateSwap(r1, c1, r2, c2) {
-    const el1 = getTileEl(r1, c1);
-    const el2 = getTileEl(r2, c2);
-    if (!el1 || !el2) return;
-    const dx = (c2 - c1) * 100;
-    const dy = (r2 - r1) * 100;
-    el1.style.transition = 'transform 0.12s ease';
-    el2.style.transition = 'transform 0.12s ease';
-    el1.style.transform = `translate(${dx}%, ${dy}%)`;
-    el2.style.transform = `translate(${-dx}%, ${-dy}%)`;
-    await sleep(130);
-    el1.style.transition = '';
-    el2.style.transition = '';
-    el1.style.transform = '';
-    el2.style.transform = '';
-}
+
 
 function playInvalid(row, col) {
     const el = getTileEl(row, col);
@@ -567,6 +548,10 @@ async function checkContractState() {
         flash.className = 'access-granted-flash';
         flash.textContent = 'ACCESS GRANTED';
         document.body.appendChild(flash);
+        
+        const hackBarFill = document.getElementById('hack-bar-fill');
+        if (hackBarFill) hackBarFill.style.width = '100%';
+        
         await sleep(800);
         if (flash.parentNode) flash.remove();
         if (window.Audio) window.Audio.hackComplete();
@@ -580,6 +565,7 @@ async function checkContractState() {
         S.eurodollars += earned;
         S.totalEurodollars += earned;
 
+        isProcessing = false;
         window.showScreen('shop');
         if (window.initShopScreen) window.initShopScreen(earned);
         return;
