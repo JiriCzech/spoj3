@@ -357,7 +357,7 @@ function initShopScreen(earnedAmount) {
     const banner = document.getElementById('shop-banner');
     const bannerText = document.getElementById('shop-banner-text');
     if (banner && bannerText) {
-        bannerText.textContent = `ACCESS GRANTED — CONTRACT COMPLETE — LVL ${S.level} CLEARED`;
+        bannerText.textContent = `ACCESS GRANTED — LVL ${S.level - 1} CLEARED | +€€${earnedAmount}`;
         banner.classList.add('visible');
     }
 

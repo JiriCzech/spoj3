@@ -86,7 +86,7 @@ window.hackTargetForLevel = function(level) {
 };
 
 window.contractRewardForLevel = function(level) {
-  return level * 80;
+  return Math.floor(80 + (level - 1) * 25);
 };
 
 window.saveBestRun = function() {

@@ -40,6 +40,19 @@ function getShopOffers() {
         remaining.splice(remaining.indexOf(pick), 1);
     }
     
+    // Check if player can afford at least 1 offer
+    const canAffordAny = offers.some(u => getUpgradeCost(u.id) <= STATE.eurodollars);
+
+    // If none affordable, replace the most expensive with the cheapest available common
+    if (!canAffordAny && available.length > 0) {
+        const cheapestCommon = available
+            .filter(u => u.rarity === 'common')
+            .sort((a, b) => a.cost - b.cost)[0];
+        if (cheapestCommon) {
+            offers[offers.length - 1] = cheapestCommon;
+        }
+    }
+    
     return offers;
 }
 

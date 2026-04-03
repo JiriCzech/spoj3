@@ -129,6 +129,12 @@
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
+  will-change: transform;
+  z-index: 1;
+}
+
+.tile.selected {
+  z-index: 3;
 }
 
 /* === TILE COLORS — dark base + neon icon glow === */
@@ -309,15 +315,6 @@
 }
 
 /* === NEW ANIMATIONS === */
-
-.tile-swap {
-  animation: tileSwap 0.22s ease;
-}
-@keyframes tileSwap {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(0.82); }
-  100% { transform: scale(1); }
-}
 
 .tile-explode {
   animation: tileExplode 0.32s ease forwards;

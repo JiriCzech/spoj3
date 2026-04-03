@@ -18,8 +18,7 @@ function sleep(ms) {
 }
 
 function getTileEl(row, col) {
-    const grid = document.getElementById('game-grid');
-    return grid ? grid.children[row * STATE.GRID_SIZE + col] || null : null;
+  return document.querySelector(`#game-grid .tile[data-row="${row}"][data-col="${col}"]`);
 }
 
 // =====================================================
@@ -89,15 +88,19 @@ function syncGridDOM() {
 }
 
 function updateTileDOM(row, col) {
-    const el = getTileEl(row, col);
-    const td = STATE.grid[row][col];
-    if (!el || !td) return;
-    el.className = `tile tile-${td.color}`;
-    el.dataset.row = row;
-    el.dataset.col = col;
-    let icon = el.querySelector('.tile-icon');
-    if (!icon) { icon = document.createElement('span'); icon.className = 'tile-icon'; el.appendChild(icon); }
-    icon.textContent = STATE.TILE_ICONS[td.color];
+  const tile = getTileEl(row, col);
+  const data = STATE.grid[row][col];
+  if (!tile || !data) return;
+  // Remove old color classes
+  STATE.COLORS.forEach(c => tile.classList.remove('tile-' + c));
+  // Add new color class
+  tile.classList.add('tile-' + data.color);
+  // Update icon
+  const icon = tile.querySelector('.tile-icon');
+  if (icon) icon.textContent = STATE.TILE_ICONS[data.color];
+  // Update data attributes
+  tile.dataset.row = row;
+  tile.dataset.col = col;
 }
 
 // =====================================================
@@ -210,75 +213,107 @@ function removeAllSelected() {
 // SWAP
 // =====================================================
 async function trySwap(r1, c1, r2, c2) {
-    if (isProcessing) return;
-    isProcessing = true;
-
-    try {
-        const dr = Math.abs(r1 - r2), dc = Math.abs(c1 - c2);
-        if (dr + dc !== 1) {
-            playInvalid(r1, c1);
-            playInvalid(r2, c2);
-            return;
-        }
-
-        // Deduct move optimistically
-        STATE.moves--;
-        STATE.currentCascadeDepth = 0;
-        updateHackBar();
-
-        // Step 1: Swap data
-        const tmp = STATE.grid[r1][c1];
-        STATE.grid[r1][c1] = STATE.grid[r2][c2];
-        STATE.grid[r2][c2] = tmp;
-
-        // Step 2: Sync DOM (updates color instantly; CSS transition handles physics)
-        updateTileDOM(r1, c1);
-        updateTileDOM(r2, c2);
-        
-        const el1 = getTileEl(r1, c1);
-        const el2 = getTileEl(r2, c2);
-        if (el1) el1.classList.add('tile-swap');
-        if (el2) el2.classList.add('tile-swap');
-        setTimeout(() => {
-            if (el1) el1.classList.remove('tile-swap');
-            if (el2) el2.classList.remove('tile-swap');
-        }, 250);
-
-        // Step 3: Check for matches
-        const matches = findMatches();
-
-        if (matches.length > 0) {
-            if (window.hasUpgrade && window.hasUpgrade('perfect_swap') && matches.length >= 5) {
-                STATE.moves++;
-                updateHackBar();
-            }
-            await processMatches(matches);
-            await checkContractState();
-        } else {
-            // No match — brief pause so player sees the swap
-            await sleep(180);
-
-            // Revert data
-            const tmp2 = STATE.grid[r1][c1];
-            STATE.grid[r1][c1] = STATE.grid[r2][c2];
-            STATE.grid[r2][c2] = tmp2;
-
-            // Sync DOM
-            updateTileDOM(r1, c1);
-            updateTileDOM(r2, c2);
-
-            // Refund the move
-            STATE.moves++;
-            updateHackBar();
-
-            // Shake feedback (invalid handles removal)
-            playInvalid(r1, c1);
-            playInvalid(r2, c2);
-        }
-
-    } finally {
-        isProcessing = false;
-    }
+  if (isProcessing) return;
+  
+  // Check adjacency
+  const dr = Math.abs(r1 - r2), dc = Math.abs(c1 - c2);
+  if (dr + dc !== 1) return;
+  
+  isProcessing = true;
+  STATE.moves--;
+  updateHackBar();
+  
+  const tile1 = getTileEl(r1, c1);
+  const tile2 = getTileEl(r2, c2);
+  
+  if (!tile1 || !tile2) { isProcessing = false; return; }
+  
+  // Calculate pixel offset between tiles
+  const rect1 = tile1.getBoundingClientRect();
+  const rect2 = tile2.getBoundingClientRect();
+  const dx = rect2.left - rect1.left;
+  const dy = rect2.top - rect1.top;
+  
+  // Apply CSS transition + translate to VISUALLY move tiles
+  tile1.style.transition = 'transform 0.22s cubic-bezier(0.34,1.4,0.64,1)';
+  tile2.style.transition = 'transform 0.22s cubic-bezier(0.34,1.4,0.64,1)';
+  tile1.style.transform = `translate(${dx}px, ${dy}px)`;
+  tile2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+  
+  // Wait for visual animation
+  await sleep(230);
+  
+  // Reset transforms
+  tile1.style.transition = '';
+  tile2.style.transition = '';
+  tile1.style.transform = '';
+  tile2.style.transform = '';
+  
+  // NOW swap data
+  const temp = STATE.grid[r1][c1];
+  STATE.grid[r1][c1] = STATE.grid[r2][c2];
+  STATE.grid[r2][c2] = temp;
+  
+  // Sync DOM to new data (updates color/icon without moving position)
+  updateTileDOM(r1, c1);
+  updateTileDOM(r2, c2);
+  
+  // Check matches
+  const matches = findMatches();
+  
+  if (matches.length === 0) {
+    // REVERT: visual slide back
+    STATE.moves++;
+    updateHackBar();
+    
+    // Swap data back first
+    const temp2 = STATE.grid[r1][c1];
+    STATE.grid[r1][c1] = STATE.grid[r2][c2];
+    STATE.grid[r2][c2] = temp2;
+    
+    await sleep(60);
+    
+    // Slide back animation
+    tile1.style.transition = 'transform 0.18s ease-in';
+    tile2.style.transition = 'transform 0.18s ease-in';
+    tile1.style.transform = `translate(${dx}px, ${dy}px)`;
+    tile2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    
+    await sleep(60);
+    
+    tile1.style.transition = 'transform 0.18s ease-out';
+    tile2.style.transition = 'transform 0.18s ease-out';
+    tile1.style.transform = '';
+    tile2.style.transform = '';
+    
+    await sleep(180);
+    
+    // Sync DOM back
+    updateTileDOM(r1, c1);
+    updateTileDOM(r2, c2);
+    
+    // Shake feedback
+    tile1.classList.add('invalid');
+    tile2.classList.add('invalid');
+    setTimeout(() => {
+      tile1.classList.remove('invalid');
+      tile2.classList.remove('invalid');
+    }, 400);
+    
+    if (window.Audio) window.Audio.invalid();
+    isProcessing = false;
+    return;
+  }
+  
+  // Valid match — process cascade
+  if (window.hasUpgrade && window.hasUpgrade('perfect_swap') && matches.length >= 5) {
+      STATE.moves++;
+      updateHackBar();
+  }
+  await processMatches(matches);
+  removeAllSelected();
+  await checkContractState();
+  isProcessing = false;
 }
 
 
@@ -586,7 +621,7 @@ async function checkContractState() {
         if (flash.parentNode) flash.remove();
         if (window.Audio) window.Audio.hackComplete();
 
-        const moveBonus = S.upgradeFlags?.efficientRunner ? 25 : 15;
+        const moveBonus = S.upgradeFlags?.efficientRunner ? 14 : 8;
         const unusedMovesBonus = S.moves * moveBonus;
 
         clearInterval(STATE.timerInterval);
@@ -713,6 +748,9 @@ function showComboIndicator(count) {
 // TIMER
 // =====================================================
 function startContractTimer() {
+    if (typeof STATE.timeLeft !== 'number' || isNaN(STATE.timeLeft)) {
+        STATE.timeLeft = 60;
+    }
     if (STATE.timerInterval) clearInterval(STATE.timerInterval);
     STATE.timerInterval = setInterval(() => {
         if (isProcessing) return; // pause during cascade
@@ -728,6 +766,9 @@ function startContractTimer() {
 }
 
 function updateTimerDisplay() {
+    if (typeof STATE.timeLeft !== 'number' || isNaN(STATE.timeLeft)) {
+        STATE.timeLeft = 60;
+    }
     const el = document.getElementById('hud-timer');
     if (!el) return;
     const mins = Math.floor(STATE.timeLeft / 60);
