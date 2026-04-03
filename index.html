@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#050a0e">
     <meta name="description" content="NETRUNNER MATCH - A cyberpunk hacking match-3 roguelike game.">
+    <meta property="og:title" content="NETRUNNER MATCH | Cyberpunk Hacking Roguelike">
+    <meta property="og:description" content="Hack corporate networks, earn Eurodollars, and upgrade your build in this neon-noir match-3 roguelike.">
+    <meta property="og:type" content="website">
     <title>NETRUNNER MATCH | Cyberpunk Hacking Roguelike</title>
     
     <!-- PWA -->
@@ -23,28 +26,136 @@
 <body class="scanline-overlay">
     <div id="app">
         <!-- Screens -->
+        <!-- BOOT SCREEN -->
         <section id="screen-boot" class="screen">
-            <!-- Initial boot sequence placeholder -->
+            <div class="boot-container scanline-overlay">
+                <div id="boot-lines"></div>
+                <div id="data-rain" aria-hidden="true"></div>
+            </div>
         </section>
 
+        <!-- MAIN MENU -->
         <section id="screen-menu" class="screen">
-            <!-- Main menu screens -->
+            <div class="menu-container scanline-overlay">
+                <div class="menu-bg-grid" aria-hidden="true"></div>
+                <div class="menu-content">
+                    <div class="menu-logo">
+                        <pre class="logo-ascii glow-cyan" aria-label="NETRUNNER MATCH">
+███╗   ██╗███████╗████████╗
+████╗  ██║██╔════╝╚══██╔══╝
+██╔██╗ ██║█████╗     ██║
+██║╚██╗██║██╔══╝     ██║
+██║ ╚████║███████╗   ██║
+╚═╝  ╚═══╝╚══════╝   ╚═╝
+██████╗ ██╗   ██╗███╗  ██╗
+██╔══██╗██║   ██║████╗ ██║
+██████╔╝██║   ██║██╔██╗██║
+██╔══██╗██║   ██║██║╚████║
+██║  ██║╚██████╔╝██║ ╚███║
+╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚══╝</pre>
+                        <p class="menu-tagline">HACK. EARN. UPGRADE. REPEAT.</p>
+                    </div>
+                    <div class="menu-actions">
+                        <button class="btn btn-primary" id="btn-new-run" aria-label="Start a new run">▶ NEW RUN</button>
+                        <button class="btn btn-secondary" id="btn-best-run" aria-label="View best run stats">◈ BEST RUN</button>
+                    </div>
+                    <div class="menu-stats" id="menu-stats"></div>
+                    <div class="menu-footer">v2.077 | BLACKWALL SYSTEMS INC.</div>
+                </div>
+            </div>
         </section>
 
+        <!-- CONTRACT SCREEN -->
         <section id="screen-contract" class="screen">
-            <!-- Mission selection -->
+            <div class="contract-container scanline-overlay">
+                <div class="contract-header">
+                    <span class="contract-tag">// INCOMING CONTRACT //</span>
+                    <span class="contract-level" id="contract-level-display"></span>
+                </div>
+                <div class="contract-body">
+                    <div class="contract-client" id="contract-client"></div>
+                    <div class="contract-flavor" id="contract-flavor"></div>
+                    <div class="contract-details">
+                        <div class="detail-row">
+                            <span class="detail-label">HACK TARGET</span>
+                            <div class="hack-bar-track" style="flex:1">
+                                <div class="hack-bar-fill" style="width:0%"></div>
+                            </div>
+                            <span class="detail-value" id="contract-target"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">REWARD</span>
+                            <span class="detail-value glow-yellow" id="contract-reward"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">MOVES</span>
+                            <span class="detail-value" id="contract-moves"></span>
+                        </div>
+                    </div>
+                    <div class="contract-upgrades-active" id="contract-upgrades-list"></div>
+                </div>
+                <div class="contract-footer">
+                    <button class="btn btn-primary" id="btn-execute" aria-label="Execute contract and start hacking">▶ EXECUTE CONTRACT</button>
+                </div>
+            </div>
         </section>
 
+        <!-- GAME SCREEN -->
         <section id="screen-game" class="screen">
-            <!-- Main Match-3 gameplay -->
+            <div class="game-hud hud">
+                <div class="hud-item">
+                    <span class="hud-label">LEVEL</span>
+                    <span class="hud-value glow-cyan" id="hud-level">LVL 01</span>
+                </div>
+                <div class="hud-item" style="text-align:center">
+                    <span class="hud-label">CLIENT</span>
+                    <span class="hud-value" id="hud-client" style="font-size:11px">---</span>
+                </div>
+                <div class="hud-item" style="text-align:right">
+                    <span class="hud-label">€€</span>
+                    <span class="hud-value glow-yellow" id="hud-euros">0</span>
+                </div>
+            </div>
+            <div class="hack-bar-container">
+                <div class="hack-bar-track">
+                    <div class="hack-bar-fill" id="hack-bar-fill"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:4px">
+                    <span class="hack-bar-label" id="hack-bar-label">HACK PROGRESS</span>
+                    <span class="hack-bar-label" id="hack-bar-moves">MOVES: 25</span>
+                </div>
+            </div>
+            <div class="grid-wrapper">
+                <div class="game-grid" id="game-grid"></div>
+            </div>
         </section>
 
+        <!-- SHOP SCREEN -->
         <section id="screen-shop" class="screen">
-            <!-- Roguelike shop between levels -->
+            <div class="shop-container scanline-overlay">
+                <div class="shop-header">
+                    <span class="contract-tag">// UPGRADE TERMINAL //</span>
+                    <span class="shop-euros glow-yellow" id="shop-euros-display"></span>
+                </div>
+                <div class="shop-complete-banner" id="shop-banner">
+                    <span id="shop-banner-text"></span>
+                </div>
+                <div class="shop-offers" id="shop-offers"></div>
+                <div class="shop-footer">
+                    <button class="btn btn-primary" id="btn-next-contract" aria-label="Proceed to next contract">▶ NEXT CONTRACT</button>
+                </div>
+            </div>
         </section>
 
+        <!-- GAME OVER SCREEN -->
         <section id="screen-gameover" class="screen">
-            <!-- Results and restart -->
+            <div class="gameover-container scanline-overlay">
+                <div class="gameover-glitch" id="gameover-title" aria-label="FLATLINED">FLATLINED</div>
+                <div class="gameover-reason" id="gameover-reason"></div>
+                <div class="gameover-stats" id="gameover-stats"></div>
+                <div class="gameover-best" id="gameover-best"></div>
+                <button class="btn btn-primary" id="btn-retry" style="margin-top:auto" aria-label="Start a new run">↺ NEW RUN</button>
+            </div>
         </section>
     </div>
 
