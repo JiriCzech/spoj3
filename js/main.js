@@ -255,30 +255,30 @@ function initShopScreen(earnedAmount) {
     const offers = typeof window.getShopOffers === 'function' ? window.getShopOffers() : [];
 
     if (offers.length === 0) {
-        const msg = document.createElement('div');
-        msg.className = 'shop-offline-msg';
-        msg.textContent = '// NO UPGRADES AVAILABLE — TERMINAL OFFLINE //';
-        offersEl.appendChild(msg);
+        offersEl.innerHTML = '<p style="color:var(--text-dim);text-align:center;font-size:12px;letter-spacing:2px">// NO UPGRADES AVAILABLE — TERMINAL OFFLINE //</p>';
     } else {
         offers.forEach(upgrade => {
+            const cost = window.getUpgradeCost(upgrade.id);
+            const canAfford = S.eurodollars >= cost;
+            const rarityColors = { common: 'var(--neon-cyan)', rare: 'var(--neon-purple)', legendary: 'var(--neon-yellow)' };
+            
             const card = document.createElement('div');
-            card.className = `shop-card rarity-${upgrade.rarity || 'common'}`;
-            card.dataset.id = upgrade.id;
+            card.className = 'card shop-card rarity-' + upgrade.rarity;
             card.innerHTML = `
-                <div class="card-name">${upgrade.name}</div>
-                <div class="card-desc">${upgrade.description}</div>
-                <div class="card-cost">€€ ${upgrade.cost}</div>
-                <button class="btn btn-secondary">▶ INSTALL</button>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="card-name" style="color:${rarityColors[upgrade.rarity]}">${upgrade.name}</span>
+                <span style="font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase">${upgrade.rarity}</span>
+              </div>
+              <p class="card-desc">${upgrade.description}</p>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto">
+                <span class="card-cost">€€ ${cost}</span>
+                <button class="btn btn-secondary" style="width:auto;padding:8px 16px;font-size:11px" 
+                  ${canAfford ? '' : 'disabled style="opacity:0.3;cursor:not-allowed"'}
+                  onclick="window.handleBuyUpgrade('${upgrade.id}', this)">
+                  ${canAfford ? 'BUY' : 'INSUFFICIENT €€'}
+                </button>
+              </div>
             `;
-            card.querySelector('button').onclick = () => {
-                if (typeof window.buyUpgrade === 'function') {
-                    const success = window.buyUpgrade(upgrade.id);
-                    if (success) {
-                        card.classList.add('purchased');
-                        if (display) display.textContent = `€€ ${S.eurodollars}`;
-                    }
-                }
-            };
             offersEl.appendChild(card);
         });
     }
@@ -292,6 +292,29 @@ function initShopScreen(earnedAmount) {
     };
 }
 window.initShopScreen = initShopScreen;
+
+window.handleBuyUpgrade = function(upgradeId, buttonEl) {
+    const success = window.buyUpgrade(upgradeId);
+    if (success) {
+        const card = buttonEl.closest('.shop-card');
+        card.classList.add('purchased');
+        document.getElementById('shop-euros-display').textContent = '€€ ' + window.STATE.eurodollars;
+        // Refresh all buy buttons (some might now be unaffordable)
+        document.querySelectorAll('.shop-card:not(.purchased) button').forEach(btn => {
+            const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+            if (match) {
+                const id = match[1];
+                const cost = window.getUpgradeCost(id);
+                if (window.STATE.eurodollars < cost) {
+                    btn.disabled = true;
+                    btn.textContent = 'INSUFFICIENT €€';
+                    btn.style.opacity = '0.3';
+                    btn.style.cursor = 'not-allowed';
+                }
+            }
+        });
+    }
+}
 
 // =====================================================
 // SCREEN: GAME OVER

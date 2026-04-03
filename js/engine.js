@@ -209,6 +209,7 @@ async function trySwap(r1, c1, r2, c2) {
 
         // Deduct move optimistically
         STATE.moves--;
+        STATE.currentCascadeDepth = 0;
         updateHackBar();
 
         // Step 1: Visually animate the swap
@@ -225,6 +226,10 @@ async function trySwap(r1, c1, r2, c2) {
         const matches = findMatches();
 
         if (matches.length > 0) {
+            if (window.hasUpgrade && window.hasUpgrade('perfect_swap') && matches.length >= 5) {
+                STATE.moves++;
+                updateHackBar();
+            }
             await processMatches(matches);
             await checkContractState();
         } else {
@@ -432,7 +437,10 @@ async function processMatches(matchedTiles, depth = 0) {
 
     // Step 7: Cascade check
     const newMatches = findMatches();
-    if (newMatches.length > 0) await processMatches(newMatches, depth + 1);
+    if (newMatches.length > 0) {
+        STATE.currentCascadeDepth = (STATE.currentCascadeDepth || 0) + 1;
+        await processMatches(newMatches, depth + 1);
+    }
 }
 
 // =====================================================
@@ -498,8 +506,14 @@ async function checkContractState() {
         await sleep(800);
         if (flash.parentNode) flash.remove();
 
-        const bonus = S.moves * 15;
-        const earned = S.contractReward + bonus;
+        const moveBonus = S.upgradeFlags?.efficientRunner ? 25 : 15;
+        const unusedMovesBonus = S.moves * moveBonus;
+        
+        let earned = S.contractReward + unusedMovesBonus;
+        if (S.upgradeFlags?.doubleEuros) earned *= 2;
+        
+        S.eurodollars += earned;
+        S.totalEurodollars += earned;
 
         window.showScreen('shop');
         if (window.initShopScreen) window.initShopScreen(earned);
@@ -507,6 +521,15 @@ async function checkContractState() {
     }
 
     if (S.moves <= 0) {
+        if (window.hasUpgrade && window.hasUpgrade('flatline_prevention') && !S.upgradeFlags?.flatlineUsed) {
+            S.moves = 6;
+            S.upgradeFlags = S.upgradeFlags || {};
+            S.upgradeFlags.flatlineUsed = true;
+            updateHackBar();
+            showFloatingText('FLATLINE PROTOCOL ACTIVATED', 'var(--neon-red)');
+            return;
+        }
+
         const gameGrid = document.getElementById('game-grid');
         if (gameGrid) {
             gameGrid.classList.add('grid-glitch');
@@ -515,6 +538,25 @@ async function checkContractState() {
         await sleep(800);
         if (window.showGameOver) window.showGameOver('OUT OF MOVES');
     }
+}
+
+function showFloatingText(text, color) {
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.position = 'fixed';
+    el.style.top = '50%';
+    el.style.left = '50%';
+    el.style.transform = 'translate(-50%, -50%)';
+    el.style.color = color;
+    el.style.fontSize = '16px';
+    el.style.letterSpacing = '3px';
+    el.style.fontFamily = 'var(--font)';
+    el.style.textShadow = `0 0 10px ${color}, 0 0 20px ${color}`;
+    el.style.zIndex = '2000';
+    el.style.animation = 'float-up 1.2s forwards';
+    el.style.pointerEvents = 'none';
+    document.body.appendChild(el);
+    setTimeout(() => { if (el.parentNode) el.remove(); }, 1200);
 }
 
 // =====================================================

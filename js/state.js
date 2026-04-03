@@ -59,12 +59,20 @@ window.resetRun = function() {
 };
 
 window.resetContract = function() {
-  window.STATE.moves = 25;
+  window.STATE.moves = 25 + (window.STATE.upgradeFlags?.extraMoves || 0);
   window.STATE.hackProgress = 0;
   window.STATE.hackTarget = window.hackTargetForLevel(window.STATE.level);
   window.STATE.contractReward = window.contractRewardForLevel(window.STATE.level);
   window.STATE.comboColor = null;
   window.STATE.comboCount = 0;
+  
+  window.STATE.currentCascadeDepth = 0;
+  window.STATE.lastMatchColor = null;
+  if (window.STATE.upgradeFlags) {
+    window.STATE.upgradeFlags.coldBootCount = 0;
+    window.STATE.upgradeFlags.blackoutUsed = false;
+    window.STATE.upgradeFlags.flatlineUsed = false;
+  }
   
   // Pick random client and flavor
   const charIdx = Math.floor(Math.random() * window.STATE.CONTRACT_CLIENTS.length);
