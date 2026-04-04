@@ -1,16 +1,16 @@
 const CACHE_NAME = 'netrunner-v3';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/css/theme.css',
-  '/css/game.css',
-  '/js/state.js',
-  '/js/audio.js',
-  '/js/upgrades.js',
-  '/js/engine.js',
-  '/js/shop.js',
-  '/js/main.js'
+  './',
+  'index.html',
+  'manifest.json',
+  'css/theme.css',
+  'css/game.css',
+  'js/state.js',
+  'js/audio.js',
+  'js/upgrades.js',
+  'js/engine.js',
+  'js/shop.js',
+  'js/main.js'
 ];
 
 self.addEventListener('install', event => {

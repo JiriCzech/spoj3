@@ -110,56 +110,23 @@ function attachTileListeners() {
     const grid = document.getElementById('game-grid');
     if (!grid) return;
 
-    let txStart = 0, tyStart = 0, tTimeStart = 0, touchedTile = null;
-
-    // Use a flag to prevent click events from firing after a touch sequence
     let lastTouchTime = 0;
 
     grid.addEventListener('touchstart', e => {
-        const tile = e.target.closest('.tile');
-        if (!tile) return;
-        touchedTile = tile;
-        txStart = e.touches[0].clientX;
-        tyStart = e.touches[0].clientY;
-        tTimeStart = Date.now();
         lastTouchTime = Date.now();
-    }, { passive: false });
+    }, { passive: true });
 
     grid.addEventListener('touchend', e => {
-        if (!touchedTile) return;
-        
-        const dx = e.changedTouches[0].clientX - txStart;
-        const dy = e.changedTouches[0].clientY - tyStart;
-        const dist = Math.hypot(dx, dy);
-        const elapsed = Date.now() - tTimeStart;
-        const r1 = parseInt(touchedTile.dataset.row);
-        const c1 = parseInt(touchedTile.dataset.col);
+        const tile = e.target.closest('.tile');
+        if (!tile) return;
 
-        // Prevent synthetic click events
+        // Prevent synthetic clicks but trigger tap immediately
         e.preventDefault();
-
-        if (dist > 35 && elapsed < 400) {
-            // SWIPE
-            let r2 = r1, c2 = c1;
-            if (Math.abs(dx) > Math.abs(dy)) {
-                c2 = dx > 0 ? c1 + 1 : c1 - 1;
-            } else {
-                r2 = dy > 0 ? r1 + 1 : r1 - 1;
-            }
-            if (r2 >= 0 && r2 < STATE.GRID_SIZE && c2 >= 0 && c2 < STATE.GRID_SIZE) {
-                STATE.selectedTile = null;
-                removeAllSelected();
-                trySwap(r1, c1, r2, c2);
-            }
-        } else if (elapsed < 350) {
-            // TAP
-            handleTap(r1, c1);
-        }
-        touchedTile = null;
+        handleTap(parseInt(tile.dataset.row), parseInt(tile.dataset.col));
     }, { passive: false });
 
     grid.addEventListener('click', e => {
-        // Ignore clicks that occur shortly after a touch (prevent double-trigger)
+        // Only trigger if it wasn't already handled by touchend
         if (Date.now() - lastTouchTime < 500) return;
         
         const tile = e.target.closest('.tile');
