@@ -60,6 +60,7 @@ window.resetRun = function() {
 
 window.resetContract = function() {
   window.STATE.moves = 25 + (window.STATE.upgradeFlags?.extraMoves || 0);
+  window.STATE.timeLeft = 60 + (window.STATE.upgradeFlags?.extraTime || 0);
   window.STATE.hackProgress = 0;
   window.STATE.isProcessing = false;
   window.STATE.hackTarget = window.hackTargetForLevel(window.STATE.level);
