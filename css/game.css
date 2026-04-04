@@ -842,18 +842,77 @@
   100% { transform: scale(1.6);  opacity: 0; }
 }
 
-/* Mobile optimizations */
-@media (max-height: 680px) {
-  .hud { height: 48px; }
-  .hud-value { font-size: 13px; }
-  .hack-bar-container { padding: 5px 12px; }
-  .hack-bar-track { height: 10px; }
-  .grid-wrapper { padding: 4px; }
-  .game-grid { gap: 2px; }
-  .tile-icon { font-size: clamp(11px, 3vw, 17px); }
+/* Mobile optimizations & Scaling */
+@media (max-width: 600px) {
+  :root {
+    --grid-size: calc(100vw - 20px);
+  }
+  
+  .menu-logo pre {
+    font-size: 8px;
+    line-height: 1.1;
+  }
+  
+  .grid-wrapper {
+    width: var(--grid-size);
+    height: var(--grid-size);
+    padding: 6px;
+    margin: 0 auto;
+  }
+  
+  .game-grid {
+    gap: 4px;
+  }
+  
+  .hud {
+    padding: 8px 12px;
+    height: auto;
+    min-height: 54px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .hud-item {
+    flex: 1 1 40%;
+  }
+  
+  .hud-label {
+    font-size: 9px;
+  }
+  
+  .hud-value {
+    font-size: 14px;
+  }
+  
+  .tile-icon {
+    font-size: 20px;
+  }
 }
 
-@media (max-height: 580px) {
-  .hud-label { display: none; }
-  .game-grid { gap: 1px; }
+/* Landscape/Short Screen Fix */
+@media (max-height: 700px) {
+  .menu-logo { margin-bottom: 10px; }
+  .logo-ascii { font-size: 7px; }
+  .screen-game { padding-top: env(safe-area-inset-top); }
+  .grid-wrapper { 
+    width: min(85vw, 65vh); 
+    height: min(85vw, 65vh); 
+  }
+  .hud { height: 48px; padding: 4px 10px; }
+}
+
+/* Touch & Install Button Polish */
+#pwa-install {
+  margin-top: 10px;
+  animation: pulse-green-border 2s infinite;
+}
+
+@keyframes pulse-green-border {
+  0%, 100% { box-shadow: 0 0 5px rgba(57,255,20,0.2); }
+  50% { box-shadow: 0 0 15px rgba(57,255,20,0.5); }
+}
+
+.btn:active, .tile:active {
+  transform: scale(0.96);
+  filter: brightness(1.3);
 }

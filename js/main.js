@@ -503,8 +503,29 @@ function showGameOver(reason) {
 window.showGameOver = showGameOver;
 
 // =====================================================
-// ENTRY POINT
+// PWA INSTALLATION LOGIC
 // =====================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const installBtn = document.getElementById('pwa-install');
+    if (installBtn) installBtn.style.display = 'block';
+});
+
+async function handleInstallClick() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+        const installBtn = document.getElementById('pwa-install');
+        if (installBtn) installBtn.style.display = 'none';
+    }
+    deferredPrompt = null;
+}
+
+// =====================================================
+// ENTRY POINT
 // =====================================================
 document.addEventListener('DOMContentLoaded', () => {
     function fixVh() {
@@ -512,6 +533,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     fixVh();
     window.addEventListener('resize', fixVh);
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('[PWA] ServiceWorker registered', reg.scope))
+            .catch(err => console.warn('[PWA] ServiceWorker failed', err));
+    }
+
+    const installBtn = document.getElementById('pwa-install');
+    if (installBtn) installBtn.onclick = handleInstallClick;
 
     if (window.loadBestRun) window.loadBestRun();
     runBootSequence();

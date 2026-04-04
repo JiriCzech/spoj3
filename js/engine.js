@@ -103,9 +103,6 @@ function updateTileDOM(row, col) {
   tile.dataset.col = col;
 }
 
-// =====================================================
-// INPUT: EVENT DELEGATION (TAP + SWIPE)
-// =====================================================
 function attachTileListeners() {
     if (listenersAttached) return;
     listenersAttached = true;
@@ -115,6 +112,9 @@ function attachTileListeners() {
 
     let txStart = 0, tyStart = 0, tTimeStart = 0, touchedTile = null;
 
+    // Use a flag to prevent click events from firing after a touch sequence
+    let lastTouchTime = 0;
+
     grid.addEventListener('touchstart', e => {
         const tile = e.target.closest('.tile');
         if (!tile) return;
@@ -122,10 +122,12 @@ function attachTileListeners() {
         txStart = e.touches[0].clientX;
         tyStart = e.touches[0].clientY;
         tTimeStart = Date.now();
-    }, { passive: true });
+        lastTouchTime = Date.now();
+    }, { passive: false });
 
     grid.addEventListener('touchend', e => {
         if (!touchedTile) return;
+        
         const dx = e.changedTouches[0].clientX - txStart;
         const dy = e.changedTouches[0].clientY - tyStart;
         const dist = Math.hypot(dx, dy);
@@ -133,7 +135,10 @@ function attachTileListeners() {
         const r1 = parseInt(touchedTile.dataset.row);
         const c1 = parseInt(touchedTile.dataset.col);
 
-        if (dist > 30 && elapsed < 400) {
+        // Prevent synthetic click events
+        e.preventDefault();
+
+        if (dist > 35 && elapsed < 400) {
             // SWIPE
             let r2 = r1, c2 = c1;
             if (Math.abs(dx) > Math.abs(dy)) {
@@ -146,13 +151,17 @@ function attachTileListeners() {
                 removeAllSelected();
                 trySwap(r1, c1, r2, c2);
             }
-        } else if (dist < 10) {
+        } else if (elapsed < 350) {
+            // TAP
             handleTap(r1, c1);
         }
         touchedTile = null;
-    }, { passive: true });
+    }, { passive: false });
 
     grid.addEventListener('click', e => {
+        // Ignore clicks that occur shortly after a touch (prevent double-trigger)
+        if (Date.now() - lastTouchTime < 500) return;
+        
         const tile = e.target.closest('.tile');
         if (!tile) return;
         handleTap(parseInt(tile.dataset.row), parseInt(tile.dataset.col));
