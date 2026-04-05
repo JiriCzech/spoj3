@@ -136,18 +136,7 @@ function initMenuScreen() {
         renderMenuStats();
     };
 
-    // A2HS Prompt
-    const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches || window.matchMedia('(display-mode: fullscreen)').matches || window.matchMedia('(display-mode: minimal-ui)').matches;
-    if (!isStandalone && !localStorage.getItem('netrunner_install_dismissed')) {
-        const a2hs = document.createElement('div');
-        a2hs.style.cssText = 'position:fixed;bottom:0;width:100%;background:var(--panel-bg);border-top:1px solid var(--border);padding:10px 16px;font-size:11px;color:var(--text-dim);letter-spacing:1px;display:flex;justify-content:space-between;z-index:500';
-        a2hs.innerHTML = '<span>Add to Home Screen for best experience</span><span style="padding:0 8px;cursor:pointer">✕</span>';
-        a2hs.querySelector('span:last-child').onclick = () => {
-            localStorage.setItem('netrunner_install_dismissed', '1');
-            a2hs.remove();
-        };
-        document.body.appendChild(a2hs);
-    }
+    // Remove A2HS banner — not needed, we have the install button
 }
 
 function renderMenuStats() {
@@ -510,18 +499,22 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     const installBtn = document.getElementById('pwa-install');
-    if (installBtn) installBtn.style.display = 'block';
+    if (installBtn) installBtn.classList.remove('hidden');
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    const installBtn = document.getElementById('pwa-install');
+    if (installBtn) installBtn.classList.add('hidden');
 });
 
 async function handleInstallClick() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-        const installBtn = document.getElementById('pwa-install');
-        if (installBtn) installBtn.style.display = 'none';
-    }
     deferredPrompt = null;
+    const installBtn = document.getElementById('pwa-install');
+    if (installBtn) installBtn.classList.add('hidden');
 }
 
 // =====================================================

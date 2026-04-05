@@ -3,7 +3,7 @@
   "short_name": "NETRUNNER",
   "theme_color": "#050a0e",
   "background_color": "#050a0e",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "portrait",
   "scope": "/spoj3/",
   "start_url": "/spoj3/",

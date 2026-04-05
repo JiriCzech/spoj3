@@ -7,8 +7,8 @@ window.UPGRADES_POOL = [
     // --- COMMON ---
     {
         id: 'cyan_boost',
-        name: 'CYAN CHANNEL OVERRIDE',
-        description: 'Cyan data packets carry 75% more payload. ICE never sees them coming.',
+        name: '🔵 CYAN CHANNEL',
+        description: 'Cyan dlaždice dávají +75% hack progress.',
         cost: 80,
         rarity: 'common',
         repeatable: false,
@@ -16,8 +16,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'purple_boost',
-        name: 'PHANTOM PROTOCOL',
-        description: 'Purple ghost packets bypass firewall logging. +75% score on purple matches.',
+        name: '🟣 PHANTOM LINK',
+        description: 'Purple dlaždice dávají +75% hack progress.',
         cost: 80,
         rarity: 'common',
         repeatable: false,
@@ -25,8 +25,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'green_boost',
-        name: 'VIRAL PAYLOAD',
-        description: 'Green virus strands self-replicate. +75% score on green matches.',
+        name: '🟢 VIRAL PAYLOAD',
+        description: 'Zelené dlaždice dávají +75% hack progress.',
         cost: 80,
         rarity: 'common',
         repeatable: false,
@@ -34,8 +34,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'red_boost',
-        name: 'BREACH CHARGE',
-        description: 'Red ICE breakers hit harder. +75% score on red matches.',
+        name: '🔴 BREACH CHARGE',
+        description: 'Červené dlaždice dávají +75% hack progress.',
         cost: 80,
         rarity: 'common',
         repeatable: false,
@@ -43,8 +43,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'efficient_runner',
-        name: 'EFFICIENT RUNNER',
-        description: 'Every unused move at contract end earns +25€€ instead of +15€€.',
+        name: '💰 EFFICIENT RUNNER',
+        description: 'Každý nevyužitý tah na konci kontraktu = +25€€ (místo +8€€).',
         cost: 100,
         rarity: 'common',
         repeatable: false,
@@ -56,8 +56,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'extra_moves',
-        name: 'WETWARE UPGRADE',
-        description: 'Neural implant optimizes pathfinding. +4 moves at start of each new contract.',
+        name: '➕ WETWARE UPGRADE',
+        description: '+4 tahy na začátku každého nového kontraktu. (Kupitelné opakovaně.)',
         cost: 130,
         rarity: 'common',
         repeatable: true,
@@ -69,8 +69,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'four_match_bonus',
-        name: 'OVERCLOCKED PARSER',
-        description: 'Matching 4 tiles triggers an overclock burst. 4-tile matches give 2× hack progress.',
+        name: '⚡ OVERCLOCKED PARSER',
+        description: 'Match-4 nebo více = 2× hack progress za ten match.',
         cost: 110,
         rarity: 'common',
         repeatable: false,
@@ -78,8 +78,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'extra_time_small',
-        name: 'CLOCK EXTENSION v1',
-        description: 'Renegotiated the contract deadline. +15 seconds per contract.',
+        name: '⏱ CLOCK EXTENSION v1',
+        description: '+15 sekund na každý kontrakt. (Kupitelné opakovaně.)',
         cost: 90, rarity: 'common', repeatable: true,
         applyOnBuy: (state) => {
             state.upgradeFlags = state.upgradeFlags || {};
@@ -91,8 +91,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'time_on_match4',
-        name: 'TEMPORAL EXPLOIT',
-        description: 'Every 4-tile match recovers 3 seconds. Efficient hacking buys time.',
+        name: '⏳ TEMPORAL EXPLOIT',
+        description: 'Každý match-4+ vrací +3 sekundy na časomíře.',
         cost: 110, rarity: 'common', repeatable: false,
         applyToScore: (baseScore, matchedTiles, state) => {
             if (matchedTiles.length >= 4) {
@@ -108,8 +108,8 @@ window.UPGRADES_POOL = [
     // --- RARE ---
     {
         id: 'combo_multiplier',
-        name: 'NEURAL FEEDBACK LOOP',
-        description: 'Consecutive matches of the same color build a feedback loop. Same color twice=1.5×, three+=2×.',
+        name: '🔁 NEURAL FEEDBACK',
+        description: 'Stejná barva dvakrát za sebou = 1.5× score. Třikrát+ = 2× score.',
         cost: 200,
         rarity: 'rare',
         repeatable: false,
@@ -131,8 +131,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'cascade_amplifier',
-        name: 'DATA SIPHON',
-        description: 'Each cascade level amplifies extraction. Every auto-chain adds +20% to match score.',
+        name: '🌊 DATA SIPHON',
+        description: 'Každá úroveň cascade přidává +20% k hack progress toho matche.',
         cost: 190,
         rarity: 'rare',
         repeatable: false,
@@ -140,8 +140,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'extra_shop_slot',
-        name: 'CORPORATE ESPIONAGE',
-        description: 'Hacked the upgrade vendor. Shop now shows 4 offers instead of 3.',
+        name: '🛒 CORP ESPIONAGE',
+        description: 'Shop zobrazuje 4 upgrady místo 3.',
         cost: 220,
         rarity: 'rare',
         repeatable: false,
@@ -153,8 +153,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'move_on_big_match',
-        name: 'REDUNDANT LINK',
-        description: 'Big data packets open new attack vectors. Matching 5+ tiles grants +1 move.',
+        name: '🔗 REDUNDANT LINK',
+        description: 'Match-5+ přidá +1 tah.',
         cost: 180,
         rarity: 'rare',
         repeatable: false,
@@ -168,8 +168,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'overclock_first',
-        name: 'COLD BOOT PROTOCOL',
-        description: 'First 3 matches each contract run at double clock speed. 2× hack progress.',
+        name: '🥶 COLD BOOT',
+        description: 'První 3 matche každého kontraktu mají 2× hack progress.',
         cost: 230,
         rarity: 'rare',
         repeatable: false,
@@ -185,8 +185,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'extra_time_large',
-        name: 'CLOCK EXTENSION v2',
-        description: 'Deep system exploit grants extra processing time. +30 seconds per contract.',
+        name: '⏱ CLOCK EXTENSION v2',
+        description: '+30 sekund na každý kontrakt.',
         cost: 210, rarity: 'rare', repeatable: false,
         applyOnBuy: (state) => {
             state.upgradeFlags = state.upgradeFlags || {};
@@ -198,8 +198,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'time_to_moves',
-        name: 'CHRONOS CONVERTER',
-        description: 'At contract end, every 5 remaining seconds converts to 1 bonus move for next contract.',
+        name: '🔄 CHRONOS CONVERT',
+        description: 'Na konci kontraktu: každých 5 zbývajících sekund = +1 tah pro příští kontrakt.',
         cost: 200, rarity: 'rare', repeatable: false,
         applyToScore: (s) => s,
         applyOnBuy: (s) => s,
@@ -212,8 +212,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'time_score_bonus',
-        name: 'DEADLINE PRESSURE',
-        description: 'When under 15 seconds, all matches score 2× hack progress. Panic is power.',
+        name: '🔥 DEADLINE PRESSURE',
+        description: 'Když zbývá ≤15 sekund: všechny matche dávají 2× hack progress.',
         cost: 190, rarity: 'rare', repeatable: false,
         applyToScore: (baseScore, matchedTiles, state) => {
             if (state.timeLeft <= 15) return baseScore * 2;
@@ -226,8 +226,8 @@ window.UPGRADES_POOL = [
     // --- LEGENDARY ---
     {
         id: 'flatline_prevention',
-        name: 'FLATLINE PROTOCOL',
-        description: 'One-time emergency buffer. When you hit 0 moves, refill to 6. Once per run.',
+        name: '🛡 FLATLINE PROTOCOL',
+        description: 'Jednou za run: při 0 tazích dostaneš 6 tahů navíc.',
         cost: 380,
         rarity: 'legendary',
         repeatable: false
@@ -235,8 +235,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'market_crash',
-        name: 'MARKET CRASH',
-        description: "Crashed the vendor's pricing algorithm. All upgrade costs reduced by 40%.",
+        name: '📉 MARKET CRASH',
+        description: 'Všechny upgrady jsou o 40% levnější.',
         cost: 350,
         rarity: 'legendary',
         repeatable: false,
@@ -248,8 +248,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'double_euros',
-        name: 'CORPO BUYOUT',
-        description: 'Sold corporate secrets to the highest bidder. Earn 2× €€ from all contracts.',
+        name: '💵 CORPO BUYOUT',
+        description: 'Všechny kontrakty vyplácejí 2× €€.',
         cost: 420,
         rarity: 'legendary',
         repeatable: false,
@@ -261,8 +261,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'blackout',
-        name: 'BLACKOUT BURST',
-        description: 'Once per contract: detonate all tiles of the most common color on the grid.',
+        name: '💥 BLACKOUT BURST',
+        description: 'Aktivní schopnost: jednou za kontrakt vymaž všechny dlaždice nejčastější barvy.',
         cost: 370,
         rarity: 'legendary',
         repeatable: false
@@ -270,8 +270,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'perfect_swap',
-        name: "NETRUNNER'S EDGE",
-        description: 'Perfect plays are free. A swap that immediately creates a 5+ match costs 0 moves.',
+        name: "🎯 NETRUNNER'S EDGE",
+        description: 'Swap vedoucí k match-5+ nestojí žádný tah.',
         cost: 360,
         rarity: 'legendary',
         repeatable: false
@@ -279,8 +279,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'ripperdoc',
-        name: 'RIPPERDOC SPECIAL',
-        description: 'Chrome upgrade activates your best installed chip twice. One random owned upgrade applies its score bonus twice this contract.',
+        name: '🔩 RIPPERDOC SPECIAL',
+        description: 'Jeden nainstalovaný upgrade aplikuje svůj score bonus 2× po celý kontrakt.',
         cost: 450,
         rarity: 'legendary',
         repeatable: false,
@@ -306,8 +306,8 @@ window.UPGRADES_POOL = [
     },
     {
         id: 'time_freeze',
-        name: 'TEMPORAL BLACKOUT',
-        description: 'Once per contract: freeze the timer for 20 seconds. ICE cannot track what does not move.',
+        name: '❄ TEMPORAL BLACKOUT',
+        description: 'Aktivní schopnost: jednou za kontrakt zmraz časomíru na 20 sekund.',
         cost: 400, rarity: 'legendary', repeatable: false,
         applyToScore: (s) => s,
         applyOnBuy: (s) => s,

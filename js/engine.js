@@ -144,6 +144,8 @@ function handleTap(row, col) {
         const el = getTileEl(row, col);
         if (el) {
             el.classList.add('selected');
+            el.classList.add('tap-feedback');
+            setTimeout(() => el.classList.remove('tap-feedback'), 260);
             if (window.Audio) window.Audio.select();
             const rip = document.createElement('div');
             rip.className = 'tile-ripple';
