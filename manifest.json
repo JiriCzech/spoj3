@@ -5,8 +5,8 @@
   "background_color": "#050a0e",
   "display": "fullscreen",
   "orientation": "portrait",
-  "scope": "/spoj3/",
-  "start_url": "/spoj3/",
+  "scope": "/spojt3/",
+  "start_url": "/spojt3/",
   "icons": [
     {
       "src": "icons/icon-192.png",

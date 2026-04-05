@@ -9,9 +9,12 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 // CORE: Screen Switcher
 // =====================================================
 function showScreen(screenId) {
+    // Clean up floating DOM elements from previous screen
+    if (window.cleanupFloatingElements) window.cleanupFloatingElements();
+
     const active = document.querySelector('.screen.active');
     const target = document.getElementById(`screen-${screenId}`);
-    
+
     if (active && active !== target) {
         active.classList.add('screen-exit');
         setTimeout(() => {
@@ -31,17 +34,13 @@ function showScreen(screenId) {
 window.showScreen = showScreen;
 
 // =====================================================
-// SCREEN: BOOT SEQUENCE
+// SCREEN: BOOT SEQUENCE — dramatic cyberpunk intro
 // =====================================================
 const BOOT_LINES = [
-    { text: '> INITIALIZING NETRUNNER_PROTOCOL v2.077...', type: 'dim' },
-    { text: '> CONNECTING TO BLACKWALL NODE...', type: 'dim' },
-    { text: '> SCANNING HOSTILE ICE LAYERS...', type: 'dim' },
-    { text: '> BYPASSING ICE [████████░░] 78%...', type: 'normal' },
-    { text: '> BYPASSING ICE [██████████] 100%...', type: 'ok' },
-    { text: '> LOADING CONTRACTOR PROFILE...', type: 'dim' },
-    { text: '> DECRYPTING RUN HISTORY...', type: 'dim' },
-    { text: '> WELCOME BACK, NETRUNNER.', type: 'ok' },
+    { text: '> CONNECTING TO BLACKWALL...', delay: 200 },
+    { text: '> BYPASSING ICE... ', delay: 300, ok: true },
+    { text: '> DECRYPTING RUNNER PROFILE...', delay: 250 },
+    { text: '> SYSTEM READY.', delay: 200, ok: true },
 ];
 
 function runBootSequence() {
@@ -53,49 +52,70 @@ function runBootSequence() {
         return;
     }
 
-    const container = document.querySelector('.boot-container');
-    const linesEl = document.getElementById('boot-lines');
+    const titleEl = document.getElementById('boot-title');
+    const lineEl = document.getElementById('boot-line');
+    const flashEl = document.getElementById('boot-flash');
 
-    // Render boot lines with staggered delay
-    function showLine(index) {
-        if (index >= BOOT_LINES.length) {
-            // All lines shown — trigger rain after 500ms
-            setTimeout(showRain, 500);
-            return;
+    // Phase 1: Title slams in with glitch
+    setTimeout(() => {
+        titleEl.textContent = 'NETRUNNER';
+        titleEl.classList.add('visible', 'glitch');
+        flashEl.classList.add('active');
+        if (window.Audio) {
+            window.Audio.select();
+        }
+    }, 100);
+
+    // Phase 2: Flash fades, lines appear one by one
+    setTimeout(() => {
+        flashEl.classList.remove('active');
+        titleEl.classList.remove('glitch');
+
+        let idx = 0;
+        function showLine() {
+            if (idx >= BOOT_LINES.length) {
+                // Phase 3: Quick rain burst then to menu
+                setTimeout(() => {
+                    showRainBurst();
+                }, 200);
+                return;
+            }
+
+            const { text, delay, ok } = BOOT_LINES[idx];
+            lineEl.innerHTML = ok
+                ? `${text}<span class="ok"> [OK]</span>`
+                : text;
+            lineEl.classList.add('visible');
+
+            if (ok && window.Audio) window.Audio.select();
+
+            setTimeout(() => {
+                lineEl.classList.remove('visible');
+                idx++;
+                setTimeout(showLine, 80);
+            }, delay);
         }
 
-        const { text, type } = BOOT_LINES[index];
-        const el = document.createElement('div');
-        el.className = `boot-line ${type}`;
-        el.textContent = text;
-        linesEl.appendChild(el);
+        showLine();
+    }, 900);
 
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => el.classList.add('visible'));
-        });
-
-        setTimeout(() => showLine(index + 1), 320);
-    }
-
-    function showRain() {
+    function showRainBurst() {
         const rain = document.getElementById('data-rain');
-        const CHARS = '01アイウエカキクサシスタチツ█▓░';
-        const COLS = 14;
+        const CHARS = '01アイウエカキクサシス';
+        const COLS = 12;
 
         for (let i = 0; i < COLS; i++) {
             const col = document.createElement('div');
             col.className = 'rain-col';
-            col.style.left = `${Math.random() * 95}%`;
-
-            const duration = 1.2 + Math.random() * 1.2;
-            const delay = Math.random() * 1.5;
+            col.style.left = `${5 + (i / COLS) * 90}%`;
+            const duration = 0.8 + Math.random() * 0.6;
+            const delay = Math.random() * 0.5;
             col.style.animationDuration = `${duration}s`;
             col.style.animationDelay = `${delay}s`;
-
+            col.style.opacity = '0.7';
             let content = '';
-            for (let j = 0; j < 18; j++) {
-                content += CHARS[Math.floor(Math.random() * CHARS.length)];
-                content += '\n';
+            for (let j = 0; j < 12; j++) {
+                content += CHARS[Math.floor(Math.random() * CHARS.length)] + '\n';
             }
             col.textContent = content;
             rain.appendChild(col);
@@ -103,17 +123,16 @@ function runBootSequence() {
 
         rain.style.opacity = '1';
 
-        // After 1600ms — fade out boot container and go to menu
+        // Fade out and transition to menu
         setTimeout(() => {
+            const container = document.getElementById('boot-screen');
             container.style.opacity = '0';
             setTimeout(() => {
                 showScreen('menu');
                 initMenuScreen();
-            }, 500);
-        }, 1600);
+            }, 400);
+        }, 600);
     }
-
-    showLine(0);
 }
 
 // =====================================================
@@ -143,10 +162,11 @@ function renderMenuStats() {
     const S = window.STATE;
     const el = document.getElementById('menu-stats');
     if (!el) return;
+    const streakLine = S.bestWinStreak > 1 ? `<br>Best Streak: 🔥 ${S.bestWinStreak}` : '';
     el.innerHTML = `
         Best Level: LVL ${S.bestLevel || '--'}<br>
         Best Score: €€ ${S.bestScore || '--'}<br>
-        Total Runs: ${S.totalRuns || 0}
+        Total Runs: ${S.totalRuns || 0}${streakLine}
     `;
 }
 window.renderMenuStats = renderMenuStats;
@@ -171,6 +191,29 @@ function initContractScreen() {
     document.getElementById('contract-reward').textContent = `€€ ${S.contractReward}`;
     document.getElementById('contract-moves').textContent = S.moves;
 
+    // Time display
+    const timeRow = document.getElementById('contract-time-row');
+    const timeEl = document.getElementById('contract-time');
+    if (timeRow && timeEl) {
+        timeRow.style.display = 'flex';
+        const mins = Math.floor(S.timeLeft / 60);
+        const secs = S.timeLeft % 60;
+        timeEl.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // Boss contract display
+    const bossRow = document.getElementById('boss-row');
+    const bossEl = document.getElementById('contract-boss');
+    if (bossRow && bossEl) {
+        if (S.isBoss && S.bossType) {
+            bossRow.style.display = 'flex';
+            bossEl.textContent = `${S.bossType.icon} ${S.bossType.name}`;
+            bossEl.title = S.bossType.desc;
+        } else {
+            bossRow.style.display = 'none';
+        }
+    }
+
     // Render active upgrades
     const upgradesEl = document.getElementById('contract-upgrades-list');
     upgradesEl.innerHTML = '';
@@ -180,6 +223,31 @@ function initContractScreen() {
         tag.textContent = upg.name || upg.id;
         upgradesEl.appendChild(tag);
     });
+
+    // Show synergy bonuses
+    const flags = S.upgradeFlags || {};
+    if (flags.synergies && flags.synergies.length > 0) {
+        const synHeader = document.createElement('div');
+        synHeader.style.cssText = 'font-size:9px;letter-spacing:2px;color:var(--neon-yellow);margin-bottom:4px;text-transform:uppercase;';
+        synHeader.textContent = '◈ SYNERGIES';
+        upgradesEl.appendChild(synHeader);
+        flags.synergies.forEach(syn => {
+            const tag = document.createElement('span');
+            tag.className = 'upgrade-tag';
+            tag.style.borderColor = 'rgba(255,214,10,0.4)';
+            tag.style.color = 'var(--neon-yellow)';
+            tag.textContent = syn.name;
+            upgradesEl.appendChild(tag);
+        });
+    }
+
+    // Show win streak
+    if (S.winStreak > 0) {
+        const streakEl = document.createElement('div');
+        streakEl.style.cssText = 'font-size:11px;color:var(--neon-yellow);letter-spacing:2px;text-align:center;margin-top:6px;';
+        streakEl.textContent = `🔥 ${S.winStreak} WIN STREAK`;
+        upgradesEl.appendChild(streakEl);
+    }
 
     // Entrance animation
     const container = document.querySelector('.contract-container');
@@ -195,8 +263,13 @@ function initContractScreen() {
 
     const hackFill = document.querySelector('.contract-details .hack-bar-fill');
     if (hackFill) {
-        hackFill.style.animation = 'bar-scan 0.6s ease forwards';
-        setTimeout(() => { if (hackFill) hackFill.style.animation = ''; }, 600);
+        hackFill.style.transition = 'width 0.6s ease';
+        hackFill.style.opacity = '0.6';
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                hackFill.style.width = '100%';
+            });
+        });
     }
 
     document.getElementById('btn-execute').onclick = () => {
@@ -248,14 +321,14 @@ function initGameScreen() {
     // Blackout Button
     const oldBtn = document.getElementById('blackout-btn');
     if (oldBtn) oldBtn.remove();
-    
+
     if (window.hasUpgrade && window.hasUpgrade('blackout') && !(S.upgradeFlags && S.upgradeFlags.blackoutUsed)) {
         const btn = document.createElement('button');
         btn.id = 'blackout-btn';
         btn.className = 'btn';
         btn.textContent = '⚡ BLACKOUT';
         btn.style.cssText = 'width:auto;margin-top:8px;padding:10px 24px;color:var(--neon-red);border-color:var(--neon-red);font-size:12px;letter-spacing:3px;box-shadow:0 0 12px rgba(255,45,85,0.3)';
-        
+
         btn.onclick = () => {
             if (!S.grid) return;
             // Count colors
@@ -273,11 +346,11 @@ function initGameScreen() {
                 btn.style.pointerEvents = 'none';
                 if (!S.upgradeFlags) S.upgradeFlags = {};
                 S.upgradeFlags.blackoutUsed = true;
-                
+
                 const targets = [];
-                for (let r=0; r<S.GRID_SIZE; r++) {
-                    for (let c=0; c<S.GRID_SIZE; c++) {
-                        if (S.grid[r][c] && S.grid[r][c].color === topColor) targets.push({row:r, col:c, color:topColor});
+                for (let r = 0; r < S.GRID_SIZE; r++) {
+                    for (let c = 0; c < S.GRID_SIZE; c++) {
+                        if (S.grid[r][c] && S.grid[r][c].color === topColor) targets.push({ row: r, col: c, color: topColor });
                     }
                 }
                 if (targets.length > 0 && typeof processMatches === 'function') processMatches(targets);
@@ -312,6 +385,29 @@ function initGameScreen() {
         };
         const wrapper = document.querySelector('.grid-wrapper');
         if (wrapper) wrapper.appendChild(freezeBtn);
+    }
+
+    // Shuffle Board Button
+    const oldShuffleBtn = document.getElementById('shuffle-btn');
+    if (oldShuffleBtn) oldShuffleBtn.remove();
+
+    if (window.hasUpgrade && window.hasUpgrade('shuffle_board') && !(S.upgradeFlags && S.upgradeFlags.shuffleUsed)) {
+        const shuffleBtn = document.createElement('button');
+        shuffleBtn.id = 'shuffle-btn';
+        shuffleBtn.className = 'btn';
+        shuffleBtn.textContent = '🔀 SHUFFLE';
+        shuffleBtn.style.cssText = 'width:auto;margin-top:6px;padding:10px 24px;color:var(--neon-purple);border-color:var(--neon-purple);font-size:12px;letter-spacing:3px;box-shadow:0 0 12px rgba(191,90,242,0.3)';
+        shuffleBtn.onclick = () => {
+            if (!S.grid) return;
+            shuffleBtn.disabled = true;
+            shuffleBtn.textContent = '🔀 SHUFFLED';
+            shuffleBtn.style.opacity = '0.4';
+            if (!S.upgradeFlags) S.upgradeFlags = {};
+            S.upgradeFlags.shuffleUsed = true;
+            if (typeof window.shuffleBoard === 'function') window.shuffleBoard();
+        };
+        const wrapper = document.querySelector('.grid-wrapper');
+        if (wrapper) wrapper.appendChild(shuffleBtn);
     }
 }
 window.initGameScreen = initGameScreen;
@@ -362,19 +458,33 @@ function initShopScreen(earnedAmount) {
             const cost = window.getUpgradeCost(upgrade.id);
             const canAfford = S.eurodollars >= cost;
             const rarityColors = { common: 'var(--neon-cyan)', rare: 'var(--neon-purple)', legendary: 'var(--neon-yellow)' };
-            
+
+            // Check if this upgrade would unlock a synergy
+            const wouldUnlock = [];
+            if (upgrade.synergy) {
+                const synCount = S.activeUpgrades.filter(u => u.synergy === upgrade.synergy).length;
+                if (synCount >= 2) wouldUnlock.push('SYNERGY!');
+            }
+            const synergyTag = wouldUnlock.length > 0
+                ? `<span style="font-size:8px;color:var(--neon-yellow);letter-spacing:1px;border:1px solid rgba(255,214,10,0.3);padding:1px 5px;border-radius:2px">◈ ${wouldUnlock.join(' + ')}</span>`
+                : '';
+
             const card = document.createElement('div');
             card.className = 'card shop-card rarity-' + upgrade.rarity;
+            const btnStyle = canAfford
+                ? 'width:auto;padding:8px 16px;font-size:11px'
+                : 'width:auto;padding:8px 16px;font-size:11px;opacity:0.3;cursor:not-allowed';
             card.innerHTML = `
-              <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
                 <span class="card-name" style="color:${rarityColors[upgrade.rarity]}">${upgrade.name}</span>
-                <span style="font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase">${upgrade.rarity}</span>
+                <span style="font-size:9px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;white-space:nowrap">${upgrade.rarity}</span>
               </div>
               <p class="card-desc">${upgrade.description}</p>
+              ${synergyTag ? `<div style="margin-top:-2px">${synergyTag}</div>` : ''}
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto">
                 <span class="card-cost">€€ ${cost}</span>
-                <button class="btn btn-secondary" style="width:auto;padding:8px 16px;font-size:11px" 
-                  ${canAfford ? '' : 'disabled style="opacity:0.3;cursor:not-allowed"'}
+                <button class="btn btn-secondary" style="${btnStyle}"
+                  ${canAfford ? '' : 'disabled'}
                   onclick="window.handleBuyUpgrade('${upgrade.id}', this)">
                   ${canAfford ? 'BUY' : 'INSUFFICIENT €€'}
                 </button>
@@ -394,13 +504,17 @@ function initShopScreen(earnedAmount) {
 }
 window.initShopScreen = initShopScreen;
 
-window.handleBuyUpgrade = function(upgradeId, buttonEl) {
+window.handleBuyUpgrade = function (upgradeId, buttonEl) {
     const success = window.buyUpgrade(upgradeId);
     if (success) {
         if (window.Audio) window.Audio.buy();
         const card = buttonEl.closest('.shop-card');
         card.classList.add('purchased');
         document.getElementById('shop-euros-display').textContent = '€€ ' + window.STATE.eurodollars;
+
+        // Apply synergies after purchase
+        if (window.applySynergies) window.applySynergies();
+
         // Refresh all buy buttons (some might now be unaffordable)
         document.querySelectorAll('.shop-card:not(.purchased) button').forEach(btn => {
             const match = btn.getAttribute('onclick').match(/'([^']+)'/);
@@ -418,7 +532,7 @@ window.handleBuyUpgrade = function(upgradeId, buttonEl) {
     }
 }
 
-window.toggleSound = function() {
+window.toggleSound = function () {
     if (window.Audio) {
         const on = window.Audio.toggle();
         const btn = document.getElementById('sound-toggle');
@@ -436,6 +550,11 @@ function showGameOver(reason) {
     }
     if (window.Audio) window.Audio.gameOver();
     reason = reason || 'OUT OF MOVES';
+
+    // Set runScore to total eurodollars earned this run
+    if (window.STATE) {
+        window.STATE.runScore = window.STATE.eurodollars;
+    }
 
     if (window.saveBestRun) window.saveBestRun();
 
@@ -459,11 +578,19 @@ function showGameOver(reason) {
     // Stats table
     const statsEl = document.getElementById('gameover-stats');
     if (statsEl) {
+        const streakHtml = S.winStreak > 0
+            ? `<div class="gameover-stat-row"><span class="gameover-stat-label">🔥 Win Streak</span><span class="gameover-stat-value" style="color:var(--neon-yellow)">${S.winStreak}</span></div>`
+            : '';
+        const contractsHtml = S.contractsWon > 0
+            ? `<div class="gameover-stat-row"><span class="gameover-stat-label">Contracts Won</span><span class="gameover-stat-value">${S.contractsWon}</span></div>`
+            : '';
         statsEl.innerHTML = `
             <div class="gameover-stat-row">
                 <span class="gameover-stat-label">Level Reached</span>
                 <span class="gameover-stat-value">LVL ${S.level}</span>
             </div>
+            ${contractsHtml}
+            ${streakHtml}
             <div class="gameover-stat-row">
                 <span class="gameover-stat-label">€€ This Run</span>
                 <span class="gameover-stat-value">€€ ${S.runScore || 0}</span>
@@ -472,14 +599,26 @@ function showGameOver(reason) {
                 <span class="gameover-stat-label">Total €€ Earned</span>
                 <span class="gameover-stat-value">€€ ${S.totalEurodollars || 0}</span>
             </div>
+            <div class="gameover-stat-row">
+                <span class="gameover-stat-label">Upgrades Owned</span>
+                <span class="gameover-stat-value">${(S.activeUpgrades || []).length}</span>
+            </div>
         `;
     }
 
     // Best run indicator
     const bestEl = document.getElementById('gameover-best');
     if (bestEl) {
-        bestEl.textContent = wasNewBest ? '◈ NEW BEST RUN ◈' : '';
-        bestEl.className = wasNewBest ? 'gameover-best glow-yellow' : 'gameover-best';
+        if (wasNewBest) {
+            bestEl.textContent = '◈ NEW BEST RUN ◈';
+            bestEl.className = 'gameover-best glow-yellow';
+        } else if (S.bestWinStreak > 1) {
+            bestEl.textContent = `Best Streak: ${S.bestWinStreak} wins`;
+            bestEl.className = 'gameover-best';
+        } else {
+            bestEl.textContent = '';
+            bestEl.className = 'gameover-best';
+        }
     }
 
     // Retry button
@@ -521,6 +660,45 @@ async function handleInstallClick() {
 // ENTRY POINT
 // =====================================================
 document.addEventListener('DOMContentLoaded', () => {
+    // Global error boundary — catch unhandled errors and show fallback UI
+    window.addEventListener('error', (e) => {
+        console.error('[NETRUNNER] Uncaught error:', e.message, e.filename, e.lineno);
+        showErrorRecovery(e.message);
+    });
+
+    window.addEventListener('unhandledrejection', (e) => {
+        console.error('[NETRUNNER] Unhandled promise rejection:', e.reason);
+        showErrorRecovery('Async error: ' + (e.reason?.message || 'Unknown'));
+    });
+
+    function showErrorRecovery(message) {
+        // Prevent duplicate error overlays
+        if (document.getElementById('netrunner-error')) return;
+
+        const overlay = document.createElement('div');
+        overlay.id = 'netrunner-error';
+        overlay.style.cssText = `
+            position:fixed; inset:0; z-index:99999;
+            background:rgba(5,10,14,0.95);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            gap:16px; padding:24px; text-align:center;
+        `;
+        overlay.innerHTML = `
+            <div style="color:#ff2d55;font-size:18px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:3px;text-shadow:0 0 12px #ff2d55">
+                ⚠ SYSTEM ERROR
+            </div>
+            <div style="color:#4a7a9b;font-size:11px;font-family:'JetBrains Mono',monospace;max-width:300px;word-break:break-all">
+                ${message || 'Unknown error'}
+            </div>
+            <button onclick="location.reload()" style="
+                background:transparent; border:1px solid #00fff9; color:#00fff9;
+                padding:10px 24px; font-size:12px; letter-spacing:2px; cursor:pointer;
+                font-family:'JetBrains Mono',monospace; margin-top:8px;
+            ">↺ REBOOT SYSTEM</button>
+        `;
+        document.body.appendChild(overlay);
+    }
+
     function fixVh() {
         document.documentElement.style.setProperty('--real-vh', window.innerHeight * 0.01 + 'px');
     }

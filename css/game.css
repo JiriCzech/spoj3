@@ -1,13 +1,32 @@
-/* Utility */
-.hidden { display: none !important; }
+/* =============================================
+   NETRUNNER MATCH — game.css (v3 REBUILD)
+   Premium mobile-game visuals, polished & clean
+   ============================================= */
 
-/* App Container */
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* =============================================
+   APP CONTAINER — responsive for mobile + desktop
+   ============================================= */
 #app {
   position: relative;
   height: 100dvh;
   max-width: 480px;
-  margin: auto;
+  margin: 0 auto;
   overflow: hidden;
+  /* On desktop, add subtle framing */
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.6), 0 0 120px rgba(0, 255, 249, 0.03);
+}
+
+@media (min-width: 481px) {
+  #app {
+    max-width: 420px;
+    border-left: 1px solid #1a3a5c;
+    border-right: 1px solid #1a3a5c;
+  }
 }
 
 /* Screens */
@@ -22,16 +41,21 @@
   display: flex;
 }
 
-/* HUD System */
+/* =============================================
+   HUD SYSTEM — clean, compact, readable
+   ============================================= */
 .hud {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: clamp(6px,2vw,10px) clamp(10px,3vw,16px);
-  border-bottom: 1px solid #1a3a5c;
-  background: linear-gradient(180deg, #0d1e2e, #080f18);
-  gap: 4px;
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(26, 58, 92, 0.6);
+  background: linear-gradient(180deg, rgba(13, 30, 46, 0.95), rgba(8, 15, 24, 0.95));
+  backdrop-filter: blur(4px);
+  gap: 6px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .hud-item {
@@ -42,105 +66,169 @@
 }
 
 .hud-label {
-  font-size: clamp(7px, 2vw, 9px);
-  color: #4a7a9b;
+  font-size: 8px;
+  color: rgba(74, 122, 155, 0.8);
   letter-spacing: 2px;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .hud-value {
-  font-size: clamp(12px, 3.8vw, 16px);
+  font-size: clamp(13px, 3.8vw, 17px);
   font-weight: 700;
   white-space: nowrap;
+  letter-spacing: 0.5px;
 }
 
-/* Progress System */
+#hud-timer {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sound toggle in HUD */
+#sound-toggle {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  z-index: 50;
+  background: rgba(13, 30, 46, 0.7);
+  border: 1px solid rgba(26, 58, 92, 0.5);
+  border-radius: 4px;
+  padding: 3px 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: all 0.15s ease;
+}
+
+#sound-toggle:active {
+  transform: scale(0.9);
+  background: rgba(13, 30, 46, 0.9);
+}
+
+/* =============================================
+   HACK BAR — sleek progress indicator
+   ============================================= */
 .hack-bar-container {
-  padding: 6px clamp(10px,3vw,16px);
-  background: #080f18;
-  border-bottom: 1px solid #1a3a5c;
+  padding: 6px 14px 8px;
+  background: rgba(8, 15, 24, 0.9);
+  border-bottom: 1px solid rgba(26, 58, 92, 0.4);
   flex-shrink: 0;
 }
 
 .hack-bar-track {
-  height: clamp(10px, 2.5vw, 16px);
-  background: #0a1520;
-  border: 1px solid #1a3a5c;
-  border-radius: 2px;
+  height: 8px;
+  background: rgba(10, 21, 32, 0.8);
+  border: 1px solid rgba(26, 58, 92, 0.3);
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
 }
 
 .hack-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, rgba(0,255,249,0.5), #00fff9);
-  box-shadow: 0 0 12px rgba(0,255,249,0.6), 0 0 24px rgba(0,255,249,0.3);
+  background: linear-gradient(90deg, rgba(0, 255, 249, 0.6), #00fff9);
+  box-shadow: 0 0 8px rgba(0, 255, 249, 0.4), 0 0 16px rgba(0, 255, 249, 0.15);
   width: 0%;
-  transition: width 0.4s ease;
+  transition: width 0.35s ease;
   position: relative;
+  border-radius: 4px;
 }
 
+/* Subtle animated stripe on fill */
 .hack-bar-fill::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 8px,
-    rgba(0,0,0,0.2) 8px,
-    rgba(0,0,0,0.2) 9px
-  );
+  background: repeating-linear-gradient(-45deg,
+      transparent,
+      transparent 4px,
+      rgba(255, 255, 255, 0.04) 4px,
+      rgba(255, 255, 255, 0.04) 8px);
+  animation: bar-stripe 0.6s linear infinite;
+}
+
+@keyframes bar-stripe {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(11px);
+  }
 }
 
 .hack-bar-label {
-  font-size: clamp(9px, 2.2vw, 11px);
-  color: var(--text-dim);
-  margin-top: 3px;
-  letter-spacing: 1px;
+  font-size: 9px;
+  color: rgba(74, 122, 155, 0.7);
+  margin-top: 4px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
-/* Match-3 Grid */
+/* =============================================
+   MATCH-3 GRID — centered, perfectly sized
+   ============================================= */
 .grid-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 6px 8px;
   overflow: hidden;
+  position: relative;
+}
+
+/* Ambient background glow behind grid */
+.grid-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  background: radial-gradient(ellipse at center, rgba(0, 255, 249, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .game-grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
-  gap: clamp(2px, 0.5vw, 5px);
-  /* Square: fill available width, cap at available height */
-  width: min(87vw, calc(100dvh - 140px));
-  height: min(87vw, calc(100dvh - 140px));
-  background: #050a0e;
-  padding: clamp(3px, 0.8vw, 6px);
-  border-radius: 4px;
-  border: 1px solid #1a3a5c;
-  box-shadow: 0 0 16px rgba(0,255,249,0.08), inset 0 0 20px rgba(0,0,0,0.6);
+  gap: 3px;
+  /* Perfect square that fits within available space */
+  width: min(calc(100dvw - 32px), calc(100dvh - 170px), 440px);
+  height: min(calc(100dvw - 32px), calc(100dvh - 170px), 440px);
+  background: rgba(8, 15, 24, 0.95);
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid rgba(26, 58, 92, 0.4);
+  box-shadow:
+    0 0 20px rgba(0, 255, 249, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
   touch-action: none;
   -webkit-user-select: none;
   user-select: none;
+  position: relative;
+  z-index: 1;
 }
 
-/* === TILE BASE === */
+/* =============================================
+   TILE BASE — premium glass-morphism style
+   ============================================= */
 .tile {
   aspect-ratio: 1;
-  border-radius: 3px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
-  background: #080f18;
-  border: 1px solid transparent;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  /* Glass-like base */
+  background: linear-gradient(145deg, rgba(15, 25, 40, 0.9), rgba(8, 15, 24, 0.95));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -148,155 +236,505 @@
   overflow: hidden;
   will-change: transform;
   z-index: 1;
-  /* Ensure minimum 44px touch target at common mobile widths */
-  min-width: 0;
-  min-height: 0;
+  /* Inner depth highlight */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.tile.selected {
-  z-index: 3;
+/* Inner glow layer for each tile */
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 4px;
+  opacity: 0.12;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
 }
 
-/* === TILE COLORS — dark base + bold neon icon glow === */
+.tile:active::before {
+  opacity: 0.25;
+}
+
+/* =============================================
+   TILE ICONS
+   ============================================= */
 .tile-icon {
-  font-size: clamp(14px, 4vw, 22px);
+  font-size: clamp(16px, 4.5vw, 24px);
   line-height: 1;
   display: block;
+  position: relative;
+  z-index: 2;
+  /* Slight drop shadow for depth */
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
+/* =============================================
+   TILE COLORS — vibrant neon on dark glass
+   ============================================= */
 .tile-cyan {
-  border-color: rgba(0,255,249,0.5);
-  background: linear-gradient(135deg, #081218 55%, rgba(0,255,249,0.14) 100%);
-  box-shadow: inset 0 0 10px rgba(0,255,249,0.15);
+  border-color: rgba(0, 255, 249, 0.35);
 }
+
+.tile-cyan::before {
+  background: radial-gradient(circle at 30% 30%, rgba(0, 255, 249, 0.3), transparent 60%);
+}
+
 .tile-cyan .tile-icon {
   color: #00fff9;
-  text-shadow: 0 0 8px #00fff9, 0 0 18px rgba(0,255,249,0.8), 0 0 30px rgba(0,255,249,0.4);
+  text-shadow: 0 0 6px rgba(0, 255, 249, 0.8), 0 0 16px rgba(0, 255, 249, 0.4);
 }
 
 .tile-purple {
-  border-color: rgba(191,90,242,0.5);
-  background: linear-gradient(135deg, #0e0818 55%, rgba(191,90,242,0.14) 100%);
-  box-shadow: inset 0 0 10px rgba(191,90,242,0.15);
+  border-color: rgba(191, 90, 242, 0.35);
 }
+
+.tile-purple::before {
+  background: radial-gradient(circle at 30% 30%, rgba(191, 90, 242, 0.3), transparent 60%);
+}
+
 .tile-purple .tile-icon {
   color: #bf5af2;
-  text-shadow: 0 0 8px #bf5af2, 0 0 18px rgba(191,90,242,0.8), 0 0 30px rgba(191,90,242,0.4);
+  text-shadow: 0 0 6px rgba(191, 90, 242, 0.8), 0 0 16px rgba(191, 90, 242, 0.4);
 }
 
 .tile-green {
-  border-color: rgba(57,255,20,0.5);
-  background: linear-gradient(135deg, #081408 55%, rgba(57,255,20,0.14) 100%);
-  box-shadow: inset 0 0 10px rgba(57,255,20,0.15);
+  border-color: rgba(57, 255, 20, 0.35);
 }
+
+.tile-green::before {
+  background: radial-gradient(circle at 30% 30%, rgba(57, 255, 20, 0.3), transparent 60%);
+}
+
 .tile-green .tile-icon {
   color: #39ff14;
-  text-shadow: 0 0 8px #39ff14, 0 0 18px rgba(57,255,20,0.8), 0 0 30px rgba(57,255,20,0.4);
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.8), 0 0 16px rgba(57, 255, 20, 0.4);
 }
 
 .tile-red {
-  border-color: rgba(255,45,85,0.5);
-  background: linear-gradient(135deg, #180810 55%, rgba(255,45,85,0.14) 100%);
-  box-shadow: inset 0 0 10px rgba(255,45,85,0.15);
+  border-color: rgba(255, 45, 85, 0.35);
 }
+
+.tile-red::before {
+  background: radial-gradient(circle at 30% 30%, rgba(255, 45, 85, 0.3), transparent 60%);
+}
+
 .tile-red .tile-icon {
   color: #ff2d55;
-  text-shadow: 0 0 8px #ff2d55, 0 0 18px rgba(255,45,85,0.8), 0 0 30px rgba(255,45,85,0.4);
+  text-shadow: 0 0 6px rgba(255, 45, 85, 0.8), 0 0 16px rgba(255, 45, 85, 0.4);
 }
 
 .tile-yellow {
-  border-color: rgba(255,214,10,0.5);
-  background: linear-gradient(135deg, #181208 55%, rgba(255,214,10,0.14) 100%);
-  box-shadow: inset 0 0 10px rgba(255,214,10,0.15);
+  border-color: rgba(255, 214, 10, 0.35);
 }
+
+.tile-yellow::before {
+  background: radial-gradient(circle at 30% 30%, rgba(255, 214, 10, 0.3), transparent 60%);
+}
+
 .tile-yellow .tile-icon {
   color: #ffd60a;
-  text-shadow: 0 0 8px #ffd60a, 0 0 18px rgba(255,214,10,0.8), 0 0 30px rgba(255,214,10,0.4);
+  text-shadow: 0 0 6px rgba(255, 214, 10, 0.8), 0 0 16px rgba(255, 214, 10, 0.4);
 }
 
 .tile-orange {
-  border-color: rgba(255,107,0,0.5);
-  background: linear-gradient(135deg, #180c08 55%, rgba(255,107,0,0.14) 100%);
-  box-shadow: inset 0 0 10px rgba(255,107,0,0.15);
-}
-.tile-orange .tile-icon {
-  color: #ff6b00;
-  text-shadow: 0 0 8px #ff6b00, 0 0 18px rgba(255,107,0,0.8), 0 0 30px rgba(255,107,0,0.4);
+  border-color: rgba(255, 107, 0, 0.35);
 }
 
-/* === TILE STATES === */
+.tile-orange::before {
+  background: radial-gradient(circle at 30% 30%, rgba(255, 107, 0, 0.3), transparent 60%);
+}
+
+.tile-orange .tile-icon {
+  color: #ff6b00;
+  text-shadow: 0 0 6px rgba(255, 107, 0, 0.8), 0 0 16px rgba(255, 107, 0, 0.4);
+}
+
+/* =============================================
+   SPECIAL TILES
+   ============================================= */
+.tile-special {
+  border-width: 2px !important;
+  animation: special-glow 1.5s ease-in-out infinite alternate;
+}
+
+.tile-bomb {
+  border-color: rgba(255, 45, 85, 0.7) !important;
+  box-shadow:
+    0 0 10px rgba(255, 45, 85, 0.4),
+    0 0 20px rgba(255, 45, 85, 0.2),
+    inset 0 0 8px rgba(255, 45, 85, 0.15) !important;
+  animation: bomb-pulse 1s ease-in-out infinite alternate;
+}
+
+.tile-color-clear {
+  border-color: rgba(0, 255, 249, 0.7) !important;
+  box-shadow:
+    0 0 14px rgba(0, 255, 249, 0.5),
+    0 0 28px rgba(0, 255, 249, 0.2),
+    inset 0 0 10px rgba(0, 255, 249, 0.15) !important;
+  animation: color-clear-spin 2s linear infinite;
+}
+
+@keyframes special-glow {
+  from {
+    filter: brightness(1);
+  }
+
+  to {
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes bomb-pulse {
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes color-clear-spin {
+  from {
+    filter: brightness(1);
+  }
+
+  to {
+    filter: brightness(1.25) hue-rotate(20deg);
+  }
+}
+
+/* =============================================
+   TILE STATES
+   ============================================= */
 .tile.selected {
-  transform: scale(1.08);
-  border-color: #00fff9 !important;
-  box-shadow: 0 0 0 1px #00fff9, 0 0 12px rgba(0,255,249,0.5), inset 0 0 12px rgba(0,255,249,0.15) !important;
-  z-index: 2;
+  transform: scale(1.06);
+  border-color: rgba(0, 255, 249, 0.8) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 249, 0.6),
+    0 0 14px rgba(0, 255, 249, 0.4),
+    inset 0 0 12px rgba(0, 255, 249, 0.1) !important;
+  z-index: 5;
+  animation: selectedPulse 1.2s ease infinite;
 }
 
 .tile.matched {
-  transform: scale(1.18);
-  filter: brightness(2.5) saturate(1.5);
-  transition: transform 0.2s ease, filter 0.2s ease;
-  z-index: 3;
+  transform: scale(1.15);
+  filter: brightness(2.5) saturate(1.6);
+  transition: transform 0.15s ease, filter 0.15s ease;
+  z-index: 10;
 }
 
 .tile.invalid {
   animation: shake 0.35s ease;
-  border-color: rgba(255,45,85,0.6) !important;
+  border-color: rgba(255, 45, 85, 0.5) !important;
 }
 
-/* UI Elements */
+/* =============================================
+   ANIMATIONS — explode, drop, fall, ripple
+   ============================================= */
+.tile-explode {
+  animation: tileExplode 0.3s ease forwards !important;
+}
+
+@keyframes tileExplode {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1);
+  }
+
+  40% {
+    transform: scale(1.3);
+    opacity: 1;
+    filter: brightness(3) saturate(2);
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+    filter: brightness(4);
+  }
+}
+
+.tile-drop {
+  animation: tileDrop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes tileDrop {
+  0% {
+    transform: translateY(-20px) scale(0.75);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.tile-fall {
+  animation: tileFall 0.22s ease-out forwards;
+}
+
+@keyframes tileFall {
+  0% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes selectedPulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(0, 255, 249, 0.5),
+      0 0 10px rgba(0, 255, 249, 0.3);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(0, 255, 249, 0.7),
+      0 0 20px rgba(0, 255, 249, 0.5);
+  }
+}
+
+/* =============================================
+   BUTTONS
+   ============================================= */
 .btn {
   display: block;
   width: 100%;
   padding: 14px;
   font-family: var(--font);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
   border: 1px solid;
-  border-radius: 2px;
+  border-radius: 6px;
   cursor: pointer;
   background: transparent;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.btn-primary { color: var(--neon-green); border-color: var(--neon-green); box-shadow: 0 0 12px rgba(57, 255, 20, 0.2); }
-.btn-primary:active { background: rgba(57, 255, 20, 0.1); }
-.btn-secondary { color: var(--neon-cyan); border-color: var(--neon-cyan); }
-.btn-danger { color: var(--neon-red); border-color: var(--neon-red); }
+.btn:active {
+  transform: scale(0.97);
+  filter: brightness(1.2);
+}
 
-/* Shop Cards */
-.card {
-  background: var(--panel-bg);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 16px;
+.btn-primary {
+  color: var(--neon-green);
+  border-color: rgba(57, 255, 20, 0.5);
+  box-shadow: 0 0 12px rgba(57, 255, 20, 0.15), inset 0 0 12px rgba(57, 255, 20, 0.05);
+}
+
+.btn-primary:active {
+  background: rgba(57, 255, 20, 0.08);
+}
+
+.btn-secondary {
+  color: var(--neon-cyan);
+  border-color: rgba(0, 255, 249, 0.4);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* =============================================
+   SHOP CARDS
+   ============================================= */
+.shop-card {
+  background: rgba(13, 30, 46, 0.8);
+  border: 1px solid rgba(26, 58, 92, 0.5);
+  border-radius: 8px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
 }
 
-.card-name { font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--neon-cyan); }
-.card-desc { font-size: 11px; color: var(--text-dim); line-height: 1.6; }
-.card-cost { font-size: 12px; color: var(--neon-yellow); margin-top: auto; }
-.card.rarity-rare { border-color: rgba(191, 90, 242, 0.5); }
-.card.rarity-legendary { border-color: rgba(255, 214, 10, 0.6); box-shadow: 0 0 10px rgba(255, 214, 10, 0.15); }
+.shop-card.rarity-rare {
+  border-color: rgba(191, 90, 242, 0.4);
+}
 
-/* ===========================
-   BOOT SCREEN
-   =========================== */
+.shop-card.rarity-legendary {
+  border-color: rgba(255, 214, 10, 0.5);
+  box-shadow: 0 0 12px rgba(255, 214, 10, 0.08);
+}
+
+.shop-card .btn {
+  margin-top: 6px;
+  font-size: 11px;
+  padding: 9px 12px;
+}
+
+.shop-card.purchased::after {
+  content: 'INSTALLED';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 10, 14, 0.88);
+  color: var(--neon-green);
+  font-size: 13px;
+  letter-spacing: 4px;
+  font-weight: 700;
+  font-family: var(--font);
+}
+
+.card-name {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.card-desc {
+  font-size: 11px;
+  color: rgba(74, 122, 155, 0.8);
+  line-height: 1.5;
+}
+
+.card-cost {
+  font-size: 12px;
+  color: var(--neon-yellow);
+}
+
+/* =============================================
+   BOOT SCREEN — dramatic cyberpunk intro
+   ============================================= */
 .boot-container {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 32px 24px;
   background: var(--bg);
   z-index: 10;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.4s ease;
+}
+
+#boot-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.boot-title {
+  font-size: clamp(20px, 7vw, 36px);
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 20px rgba(0, 255, 249, 0.6), 0 0 40px rgba(0, 255, 249, 0.2);
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+.boot-title.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.boot-title.glitch {
+  animation: boot-glitch 0.3s steps(1) 2;
+}
+
+@keyframes boot-glitch {
+  0% {
+    transform: translate(0) scale(1);
+    filter: hue-rotate(0deg);
+  }
+
+  20% {
+    transform: translate(-3px, 2px) scale(1.02);
+    filter: hue-rotate(90deg);
+  }
+
+  40% {
+    transform: translate(3px, -1px) scale(0.98);
+    filter: hue-rotate(180deg);
+  }
+
+  60% {
+    transform: translate(-2px, -2px) scale(1.01);
+    filter: hue-rotate(270deg);
+  }
+
+  80% {
+    transform: translate(2px, 1px) scale(0.99);
+    filter: hue-rotate(180deg);
+  }
+
+  100% {
+    transform: translate(0) scale(1);
+    filter: hue-rotate(0deg);
+  }
+}
+
+.boot-line-active {
+  font-size: clamp(11px, 3vw, 14px);
+  color: var(--neon-cyan);
+  letter-spacing: 2px;
+  margin-top: 24px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  min-height: 20px;
+}
+
+.boot-line-active.visible {
+  opacity: 1;
+}
+
+.boot-line-active .ok {
+  color: var(--neon-green);
+  font-weight: 700;
+}
+
+.boot-flash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(0, 255, 249, 0.15), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.boot-flash.active {
+  opacity: 1;
+}
+
+#data-rain {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 1;
 }
 
 #boot-lines {
@@ -311,77 +749,20 @@
   font-size: 13px;
   color: var(--neon-cyan);
   opacity: 0;
-  font-family: var(--font);
   transition: opacity 0.1s;
 }
 
-.boot-line.visible { opacity: 1; }
+.boot-line.visible {
+  opacity: 1;
+}
 
 .boot-line.ok::after {
   content: " [OK]";
   color: var(--neon-green);
 }
 
-.boot-line.dim { color: var(--text-dim); }
-
-#data-rain {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  z-index: 1;
-}
-
-/* === NEW ANIMATIONS === */
-
-.tile-explode {
-  animation: tileExplode 0.32s ease forwards;
-}
-@keyframes tileExplode {
-  0%   { transform: scale(1);    opacity: 1; filter: brightness(1); }
-  50%  { transform: scale(1.28); opacity: 1; filter: brightness(2.5); }
-  100% { transform: scale(0);    opacity: 0; filter: brightness(3); }
-}
-
-.tile-drop {
-  animation: tileDrop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-@keyframes tileDrop {
-  0%   { transform: translateY(-24px) scale(0.7); opacity: 0; }
-  100% { transform: translateY(0)     scale(1);   opacity: 1; }
-}
-
-.tile-fall {
-  animation: tileFall 0.25s ease-in forwards;
-}
-@keyframes tileFall {
-  0%   { transform: translateY(-12px); }
-  100% { transform: translateY(0); }
-}
-
-.tile.selected {
-  animation: selectedPulse 1s ease infinite;
-}
-@keyframes selectedPulse {
-  0%, 100% { box-shadow: 0 0 0 1px #00fff9, 0 0 10px rgba(0,255,249,0.4); }
-  50%      { box-shadow: 0 0 0 2px #00fff9, 0 0 20px rgba(0,255,249,0.7); }
-}
-
-.hud-value.timer-warning {
-  color: var(--neon-yellow);
-  text-shadow: 0 0 8px var(--neon-yellow);
-  animation: timerPulse 1s ease infinite;
-}
-.hud-value.danger {
-  color: var(--neon-red) !important;
-  text-shadow: 0 0 10px var(--neon-red);
-  animation: timerPulse 0.5s ease infinite;
-}
-@keyframes timerPulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.5; }
+.boot-line.dim {
+  color: var(--text-dim);
 }
 
 .rain-col {
@@ -389,15 +770,15 @@
   top: -100%;
   font-size: 11px;
   color: var(--neon-green);
-  opacity: 0.6;
+  opacity: 0.5;
   white-space: nowrap;
   line-height: 1.4;
   animation: data-fall linear infinite;
 }
 
-/* ===========================
-   MAIN MENU SCREEN
-   =========================== */
+/* =============================================
+   MAIN MENU
+   ============================================= */
 .menu-container {
   height: 100%;
   display: flex;
@@ -410,9 +791,9 @@
   position: absolute;
   inset: 0;
   background-image:
-    repeating-linear-gradient(0deg, rgba(26, 58, 92, 0.3) 0px, rgba(26, 58, 92, 0.3) 1px, transparent 1px, transparent 40px),
-    repeating-linear-gradient(90deg, rgba(26, 58, 92, 0.3) 0px, rgba(26, 58, 92, 0.3) 1px, transparent 1px, transparent 40px);
-  opacity: 0.4;
+    repeating-linear-gradient(0deg, rgba(26, 58, 92, 0.2) 0px, rgba(26, 58, 92, 0.2) 1px, transparent 1px, transparent 40px),
+    repeating-linear-gradient(90deg, rgba(26, 58, 92, 0.2) 0px, rgba(26, 58, 92, 0.2) 1px, transparent 1px, transparent 40px);
+  opacity: 0.3;
   pointer-events: none;
 }
 
@@ -433,8 +814,8 @@
 }
 
 .logo-ascii {
-  font-size: clamp(5px, 1.8vw, 9px);
-  line-height: 1.2;
+  font-size: clamp(5px, 1.8vw, 8px);
+  line-height: 1.15;
   letter-spacing: 0;
   white-space: pre;
   color: var(--neon-cyan);
@@ -442,17 +823,17 @@
 }
 
 .menu-tagline {
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 4px;
   color: var(--text-dim);
   text-align: center;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .menu-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .menu-stats {
@@ -461,11 +842,6 @@
   text-align: center;
   line-height: 1.8;
   letter-spacing: 1px;
-  transition: color 0.3s;
-}
-
-.menu-stats.flash {
-  color: var(--neon-cyan);
 }
 
 .menu-footer {
@@ -473,18 +849,18 @@
   color: var(--text-dim);
   text-align: center;
   letter-spacing: 2px;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
-/* ===========================
+/* =============================================
    CONTRACT SCREEN
-   =========================== */
+   ============================================= */
 .contract-container {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 24px;
-  gap: 20px;
+  padding: 24px 20px;
+  gap: 18px;
   overflow-y: auto;
 }
 
@@ -495,60 +871,53 @@
 }
 
 .contract-tag {
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 3px;
   color: var(--text-dim);
 }
 
 .contract-level {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--neon-cyan);
   font-weight: 700;
-}
-
-.contract-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex: 1;
 }
 
 .contract-client {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--neon-cyan);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
 .contract-flavor {
   font-size: 12px;
   color: var(--text-dim);
-  line-height: 1.7;
-  border-left: 2px solid var(--border);
+  line-height: 1.6;
+  border-left: 2px solid rgba(26, 58, 92, 0.5);
   padding-left: 12px;
 }
 
 .contract-details {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: var(--panel-bg);
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  gap: 12px;
+  background: rgba(13, 30, 46, 0.6);
+  padding: 14px 16px;
+  border: 1px solid rgba(26, 58, 92, 0.4);
+  border-radius: 6px;
 }
 
 .detail-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .detail-label {
   font-size: 9px;
   letter-spacing: 2px;
   color: var(--text-dim);
-  min-width: 90px;
+  min-width: 80px;
   text-transform: uppercase;
 }
 
@@ -559,22 +928,21 @@
   margin-left: auto;
 }
 
-.glow-yellow { text-shadow: 0 0 8px var(--neon-yellow); color: var(--neon-yellow); }
-
 .contract-upgrades-active {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
 }
 
 .upgrade-tag {
   font-size: 9px;
   letter-spacing: 1px;
   padding: 3px 8px;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(26, 58, 92, 0.4);
   color: var(--neon-purple);
-  border-radius: 2px;
+  border-radius: 3px;
   text-transform: uppercase;
+  background: rgba(13, 30, 46, 0.4);
 }
 
 .contract-footer {
@@ -582,15 +950,15 @@
   padding-top: 8px;
 }
 
-/* ===========================
+/* =============================================
    SHOP SCREEN
-   =========================== */
+   ============================================= */
 .shop-container {
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 24px;
-  gap: 16px;
+  padding: 20px;
+  gap: 14px;
 }
 
 .shop-header {
@@ -606,18 +974,20 @@
 }
 
 .shop-complete-banner {
-  background: rgba(57, 255, 20, 0.08);
-  border: 1px solid var(--neon-green);
-  border-radius: 2px;
-  padding: 12px 16px;
+  background: rgba(57, 255, 20, 0.06);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  border-radius: 6px;
+  padding: 10px 14px;
   text-align: center;
   display: none;
 }
 
-.shop-complete-banner.visible { display: block; }
+.shop-complete-banner.visible {
+  display: block;
+}
 
 #shop-banner-text {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--neon-green);
   letter-spacing: 2px;
 }
@@ -625,77 +995,35 @@
 .shop-offers {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   overflow-y: auto;
   flex: 1;
-}
-
-.shop-card {
-  background: var(--panel-bg);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
-.shop-card .btn {
-  margin-top: 8px;
-  font-size: 11px;
-  padding: 10px;
-}
-
-.shop-card.purchased::after {
-  content: 'INSTALLED';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(5, 10, 14, 0.85);
-  color: var(--neon-green);
-  font-size: 14px;
-  letter-spacing: 4px;
-  font-weight: 700;
-  font-family: var(--font);
-}
-
-.shop-offline-msg {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-align: center;
-  padding: 32px 16px;
-  border: 1px solid var(--border);
-  border-radius: 2px;
+  padding-right: 2px;
 }
 
 .shop-footer {
   margin-top: auto;
 }
 
-/* ===========================
+/* =============================================
    GAME OVER SCREEN
-   =========================== */
+   ============================================= */
 .gameover-container {
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 32px 24px;
-  gap: 20px;
+  gap: 18px;
   justify-content: center;
 }
 
 .gameover-glitch {
-  font-size: clamp(36px, 12vw, 56px);
+  font-size: clamp(32px, 11vw, 52px);
   font-weight: 700;
   color: var(--neon-red);
   text-align: center;
   letter-spacing: 4px;
-  text-shadow: 0 0 20px var(--neon-red);
+  text-shadow: 0 0 20px rgba(255, 45, 85, 0.6);
 }
 
 .gameover-glitch.animate {
@@ -711,13 +1039,13 @@
 }
 
 .gameover-stats {
-  background: var(--panel-bg);
-  border: 1px solid var(--border);
-  padding: 20px;
+  background: rgba(13, 30, 46, 0.6);
+  border: 1px solid rgba(26, 58, 92, 0.4);
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  border-radius: 2px;
+  gap: 10px;
+  border-radius: 6px;
 }
 
 .gameover-stat-row {
@@ -745,105 +1073,236 @@
   min-height: 20px;
 }
 
-/* ===========================
-   ENGINE — DYNAMIC STATES
-   =========================== */
+/* =============================================
+   DYNAMIC STATES — hot bar, danger, glitch
+   ============================================= */
 
 /* Hot hack bar */
 .hack-bar-fill.bar-hot {
-  background: var(--neon-green);
-  box-shadow: 0 0 12px var(--neon-green);
-  animation: pulse-green 1s ease-in-out infinite alternate;
+  background: linear-gradient(90deg, rgba(57, 255, 20, 0.6), var(--neon-green));
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.5), 0 0 20px rgba(57, 255, 20, 0.2);
+}
+
+/* Complete hack bar */
+.hack-bar-fill.bar-complete {
+  background: linear-gradient(90deg, #39ff14, #00fff9);
+  box-shadow: 0 0 18px rgba(57, 255, 20, 0.7);
+  animation: pulse-green 0.5s ease infinite;
 }
 
 @keyframes pulse-green {
-  from { box-shadow: 0 0 6px var(--neon-green); }
-  to   { box-shadow: 0 0 18px var(--neon-green), 0 0 30px var(--neon-green); }
+  from {
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+  }
+
+  to {
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.8), 0 0 40px rgba(57, 255, 20, 0.3);
+  }
 }
 
-/* Danger moves */
-.hack-bar-label.danger {
-  color: var(--neon-red);
-  text-shadow: 0 0 6px var(--neon-red);
+.moves-danger {
+  color: var(--neon-red) !important;
+  text-shadow: 0 0 6px rgba(255, 45, 85, 0.6) !important;
 }
 
-.moves-danger { color: var(--neon-red) !important; text-shadow: 0 0 8px var(--neon-red) !important; }
-.moves-danger.shake { animation: shake 0.35s ease; }
-
-/* Tile falling animation */
-.tile.falling {
-  animation: tile-drop 0.28s ease-out;
+.moves-danger.shake {
+  animation: shake 0.35s ease;
 }
 
-@keyframes tile-drop {
-  from { transform: translateY(-40px); opacity: 0; }
-  to   { transform: translateY(0);     opacity: 1; }
+/* Timer danger */
+.hud-value.danger {
+  color: var(--neon-red) !important;
+  text-shadow: 0 0 8px rgba(255, 45, 85, 0.6);
+  animation: timerPulse 0.6s ease infinite;
 }
 
-/* Grid glitch on lose */
+.hud-value.timer-warning {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 6px rgba(255, 214, 10, 0.4);
+  animation: timerPulse 1.2s ease infinite;
+}
+
+@keyframes timerPulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Grid glitch */
 .game-grid.grid-glitch {
   animation: glitch 0.12s steps(1) 5;
 }
 
-/* Access granted fullscreen flash */
+/* Access granted flash */
 .access-granted-flash {
   position: fixed;
   inset: 0;
-  background: rgba(57, 255, 20, 0.12);
+  background: rgba(57, 255, 20, 0.1);
   z-index: 1000;
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 22px;
   letter-spacing: 6px;
   color: var(--neon-green);
   font-weight: 700;
   font-family: var(--font);
-  text-shadow: 0 0 20px var(--neon-green);
+  text-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
   animation: fadeInOut 0.8s ease forwards;
 }
 
 @keyframes fadeInOut {
-  0%   { opacity: 0; }
-  30%  { opacity: 1; }
-  70%  { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }
 
-/* ===========================
-   PWA & JUICE UPDATES
-   =========================== */
-
-/* Touch interactions */
-#game-grid {
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
+/* =============================================
+   SCREEN TRANSITIONS
+   ============================================= */
+.screen-exit {
+  animation: screenExit 0.2s ease forwards;
 }
 
-/* Screen Transitions */
-.screen-exit { animation: screenExit 0.2s ease forwards; }
-.screen-enter { animation: screenEnter 0.25s ease forwards; }
-@keyframes screenExit { to { opacity: 0; transform: translateY(-8px); } }
-@keyframes screenEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.screen-enter {
+  animation: screenEnter 0.25s ease forwards;
+}
 
-/* Contract bar scan */
-@keyframes bar-scan { 0%{width:0%} 50%{width:30%} 100%{width:0%} }
+@keyframes screenExit {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
 
-/* Hack bar complete */
-.hack-bar-fill.bar-complete {
-  background: linear-gradient(90deg, #39ff14, #00fff9);
-  box-shadow: 0 0 20px rgba(57,255,20,0.8);
-  animation: pulse-green 0.5s ease infinite;
+@keyframes screenEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================
+   MISC EFFECTS
+   ============================================= */
+
+/* Contract bar scan animation */
+@keyframes bar-scan {
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 30%;
+  }
+
+  100% {
+    width: 0%;
+  }
 }
 
 /* Combo pop */
 @keyframes combo-pop {
-  0%   { transform: translateX(-50%) scale(1.5); opacity: 0; }
-  20%  { transform: translateX(-50%) scale(1.0); opacity: 1; }
-  70%  { transform: translateX(-50%) scale(1.0); opacity: 1; }
-  100% { transform: translateX(-50%) scale(0.9); opacity: 0; }
+  0% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(1.0);
+    opacity: 1;
+  }
+
+  70% {
+    transform: translate(-50%, -50%) scale(1.0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Cascade pop */
+@keyframes cascade-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(1.8);
+    opacity: 0;
+  }
+
+  15% {
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  70% {
+    transform: translate(-50%, -50%) scale(1.0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0;
+  }
+}
+
+/* Jackpot pop */
+@keyframes jackpot-pop {
+  0% {
+    transform: translate(-50%, -50%) scale(2.5);
+    opacity: 0;
+  }
+
+  10% {
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 1;
+  }
+
+  20% {
+    transform: translate(-50%, -50%) scale(1.15);
+  }
+
+  30% {
+    transform: translate(-50%, -50%) scale(1.0);
+  }
+
+  60% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0;
+  }
 }
 
 /* Tile ripple */
@@ -855,30 +1314,133 @@
   opacity: 1;
   transform: scale(1);
   animation: tile-ripple-out 0.5s ease forwards;
+  pointer-events: none;
 }
 
 @keyframes tile-ripple-out {
-  0%   { transform: scale(1);    opacity: 0.8; }
-  100% { transform: scale(1.6);  opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
 }
 
-/* === SAFE AREA / NOTCH SUPPORT === */
+/* Tile tap glow */
+@keyframes tapGlow {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  40% {
+    transform: scale(1.12);
+    filter: brightness(2);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+.tile.tap-feedback {
+  animation: tapGlow 0.22s ease forwards;
+}
+
+/* Shake */
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* Glitch */
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+    filter: hue-rotate(0deg);
+  }
+
+  33% {
+    transform: translate(-2px, 1px);
+    filter: hue-rotate(90deg);
+  }
+
+  66% {
+    transform: translate(2px, -1px);
+    filter: hue-rotate(180deg);
+  }
+
+  100% {
+    transform: translate(0);
+    filter: hue-rotate(360deg);
+  }
+}
+
+/* =============================================
+   PWA INSTALL BUTTON
+   ============================================= */
+#pwa-install {
+  margin-top: 8px;
+  color: var(--neon-green) !important;
+  border-color: rgba(57, 255, 20, 0.4) !important;
+  animation: pulse-green-border 2s infinite;
+}
+
+@keyframes pulse-green-border {
+
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba(57, 255, 20, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 0 14px rgba(57, 255, 20, 0.4);
+  }
+}
+
+/* =============================================
+   SAFE AREA / NOTCH
+   ============================================= */
 #screen-game {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Mobile: portrait phone ≤480px */
+/* =============================================
+   RESPONSIVE — mobile
+   ============================================= */
 @media (max-width: 480px) {
+  #app {
+    max-width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+
   .logo-ascii {
-    font-size: clamp(5px, 1.6vw, 8px);
+    font-size: clamp(4.5px, 1.5vw, 7px);
     line-height: 1.1;
   }
 
   .game-grid {
-    /* On narrow phones use more width */
-    width: min(90vw, calc(100dvh - 130px));
-    height: min(90vw, calc(100dvh - 130px));
+    width: min(calc(100dvw - 20px), calc(100dvh - 160px));
+    height: min(calc(100dvw - 20px), calc(100dvh - 160px));
+    padding: 4px;
+    gap: 2.5px;
   }
 
   .tile-icon {
@@ -886,55 +1448,74 @@
   }
 
   .btn {
-    padding: clamp(12px, 3.5vw, 16px);
-    font-size: clamp(12px, 3.5vw, 15px);
+    padding: 13px;
+    font-size: 12px;
+  }
+
+  .hud {
+    padding: 6px 10px;
+  }
+
+  .hack-bar-container {
+    padding: 5px 10px 7px;
   }
 }
 
-/* Landscape fix */
+/* =============================================
+   RESPONSIVE — landscape / short screens
+   ============================================= */
 @media (max-height: 600px) {
-  .menu-logo { margin-bottom: 6px; }
-  .logo-ascii { font-size: 6px; }
-  .game-grid {
-    width: min(75vw, 58vh);
-    height: min(75vw, 58vh);
+  .menu-logo {
+    margin-bottom: 4px;
   }
-  .hud { padding: 4px 10px; }
-  .hack-bar-container { padding: 4px 10px; }
+
+  .logo-ascii {
+    font-size: 5.5px;
+  }
+
+  .game-grid {
+    width: min(calc(100dvw - 20px), 55vh);
+    height: min(calc(100dvw - 20px), 55vh);
+  }
+
+  .hud {
+    padding: 3px 10px;
+  }
+
+  .hack-bar-container {
+    padding: 3px 10px 5px;
+  }
+
+  .contract-container {
+    padding: 14px 16px;
+    gap: 10px;
+  }
 }
 
-/* Install Button */
-#pwa-install {
-  margin-top: 10px;
-  color: var(--neon-green) !important;
-  border-color: var(--neon-green) !important;
-  animation: pulse-green-border 2s infinite;
+/* =============================================
+   RESPONSIVE — desktop / tablet (>480px)
+   ============================================= */
+@media (min-width: 481px) {
+  .game-grid {
+    width: min(440px, calc(100dvh - 180px));
+    height: min(440px, calc(100dvh - 180px));
+  }
 }
 
-@keyframes pulse-green-border {
-  0%, 100% { box-shadow: 0 0 5px rgba(57,255,20,0.2); }
-  50% { box-shadow: 0 0 18px rgba(57,255,20,0.6); }
-}
+/* =============================================
+   REDUCED MOTION
+   ============================================= */
+@media (prefers-reduced-motion: reduce) {
 
-/* Touch feedback */
-.btn:active {
-  transform: scale(0.96);
-  filter: brightness(1.3);
-}
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 
-.tile:active {
-  transform: scale(1.12);
-  filter: brightness(1.8);
-  z-index: 5;
-}
-
-/* Tile tap glow burst */
-@keyframes tapGlow {
-  0%   { transform: scale(1); filter: brightness(1); }
-  40%  { transform: scale(1.15); filter: brightness(2.2); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-
-.tile.tap-feedback {
-  animation: tapGlow 0.25s ease forwards;
+  .hack-bar-fill::after {
+    animation: none;
+  }
 }
